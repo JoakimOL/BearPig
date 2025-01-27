@@ -1,4 +1,4 @@
-add_executable(main main.cpp)
-target_compile_features(main PRIVATE cxx_std_20)
+add_executable(bearpig main.cpp)
+target_compile_features(bearpig PRIVATE cxx_std_20)
 
-target_link_libraries(main PRIVATE lib spdlog::spdlog argparse)
+target_link_libraries(bearpig PRIVATE libbearpig spdlog::spdlog argparse)

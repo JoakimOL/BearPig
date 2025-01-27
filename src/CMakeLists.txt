@@ -1,8 +1,8 @@
-set(HEADER_LIST "${project_SOURCE_DIR}/include/lib/lib.h")
+set(HEADER_LIST "${bearpig_SOURCE_DIR}/include/libbearpig/lib.h")
 
-add_library(lib lib.cpp ${HEADER_LIST})
+add_library(libbearpig lib.cpp ${HEADER_LIST})
 
-target_include_directories(lib PUBLIC ../include)
+target_include_directories(libbearpig PUBLIC ../include)
 
 fetchcontent_declare(
     spdlog
@@ -12,11 +12,11 @@ fetchcontent_declare(
 
 fetchcontent_makeavailable(spdlog)
 
-target_link_libraries(lib PRIVATE
+target_link_libraries(libbearpig PRIVATE
   spdlog::spdlog
   argparse
 )
 
 # All users of this library will need at least C++20
-target_compile_features(lib PUBLIC cxx_std_20)
+target_compile_features(libbearpig PUBLIC cxx_std_20)
 

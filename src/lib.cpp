@@ -1,3 +1,3 @@
-#include <lib/lib.h>
+#include <libbearpig/lib.h>
 
 int foo() { return 42; }

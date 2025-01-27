@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(
-  project
+  bearpig
   VERSION 0.1
-  DESCRIPTION "a super cool project"
+  DESCRIPTION "A scanner generator to be used with JACC"
   LANGUAGES CXX)
 
 set(cmake_export_compile_commands on)
