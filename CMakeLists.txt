@@ -6,7 +6,7 @@ project(
   DESCRIPTION "A scanner generator to be used with JACC"
   LANGUAGES CXX)
 
-set(cmake_export_compile_commands on)
+set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 # only do if main project not if included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
