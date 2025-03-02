@@ -18,7 +18,7 @@ struct State {
 
 struct NFA {
 private:
-  size_t next_index = 0;
+  size_t next_id = 0;
 
 public:
   std::map<size_t, State> states;
@@ -30,6 +30,10 @@ public:
 
   void add_transition_to_state(size_t state_id, const Transition &transition) {
     states.at(state_id).transitions.insert({transition.edge, transition});
+  }
+  void add_transition_to_state(size_t state_id, size_t to, char edge) {
+    Transition transition{state_id, to, edge};
+    states.at(state_id).transitions.insert({edge, transition});
   }
 };
 

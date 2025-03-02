@@ -1,4 +1,3 @@
-#include <fmt/core.h>
 #include <fstream>
 #include <libbearpig/nfa.h>
 
@@ -21,23 +20,23 @@ void NFA::to_dot(std::filesystem::path dotfile) const {
 }
 
 size_t NFA::add_state() {
-  State s;
-  s.id = next_index++;
-  states.insert({s.id, s});
-  return s.id;
+  State state;
+  state.id = next_id++;
+  states.insert({state.id, state});
+  return state.id;
 }
 
 void NFA::fill_with_dummy_data() {
-  size_t index = add_state();
-  add_transition_to_state(index, {index, index + 1, 'a'});
+  size_t state_id = add_state();
+  add_transition_to_state(state_id, state_id + 1, 'a');
 
-  index = add_state();
-  add_transition_to_state(index, {index, index + 1, 'b'});
+  state_id = add_state();
+  add_transition_to_state(state_id, state_id + 1, 'b');
 
-  add_transition_to_state(index, {index, index, 'b'});
-  add_transition_to_state(index, {index, index + 2, 's'});
+  add_transition_to_state(state_id, state_id, 'b');
+  add_transition_to_state(state_id, state_id + 2, 's');
 
-  index = add_state();
-  add_transition_to_state(index, {index, index + 1, 'c'});
-  add_transition_to_state(index, {index, index + 1, 't'});
+  state_id = add_state();
+  add_transition_to_state(state_id, state_id + 1, 'c');
+  add_transition_to_state(state_id, state_id + 1, 't');
 }
