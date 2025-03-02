@@ -1,9 +1,38 @@
+#include "libbearpig/regexparser.h"
+#include "libbearpig/regexscanner.h"
 #include <libbearpig/lib.h>
 #include <gtest/gtest.h>
 
-TEST(HELLOWORLD, TESTS_ARE_WORKING){
-  EXPECT_EQ(1,1);
+TEST(REGEXPARSER, basic_able_to_parse_characters){
+  RegexScanner rs{"a"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
 }
-// TEST(HELLOWORLD, TESTS_ARE_NOT_WORKING){
-//   EXPECT_EQ(1,2);
-// }
+
+TEST(REGEXPARSER, basic_able_to_parse_groups){
+  RegexScanner rs{"((a))"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
+TEST(REGEXPARSER, basic_able_to_parse_any){
+  RegexScanner rs{"."};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
+TEST(REGEXPARSER, basic_able_to_parse_nested_group_with_any){
+  RegexScanner rs{"((.))"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
