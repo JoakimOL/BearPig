@@ -14,7 +14,6 @@ public:
 private:
   void end_of_input_error();
   void print_error_message_and_exit(const std::string&, int loc);
-  std::string_view recreate_input();
   bool parse_regex();
   bool parse_quantified_exp();
   bool parse_character();
