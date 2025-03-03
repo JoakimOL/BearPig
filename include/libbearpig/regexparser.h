@@ -15,6 +15,8 @@ private:
   void end_of_input_error();
   void print_error_message_and_exit(const std::string&, int loc);
   bool parse_regex();
+  bool parse_simple_exp();
+  bool parse_concatenation_exp();
   bool parse_quantified_exp();
   bool parse_character();
   bool parse_any();

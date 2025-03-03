@@ -62,3 +62,21 @@ TEST(REGEXPARSER, basic_able_to_parse_optional){
   EXPECT_TRUE(rp.parse());
   EXPECT_TRUE(rp.is_done());
 }
+
+TEST(REGEXPARSER, basic_able_to_parse_concat){
+  RegexScanner rs{"aaaaabaab."};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
+
+TEST(REGEXPARSER, basic_able_to_parse_a_bunch_of_stuff){
+  RegexScanner rs{"a.+(a?b*c+)*f"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}

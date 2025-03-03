@@ -36,9 +36,50 @@ bool RegexParser::parse() { return parse_regex() && is_done(); }
 
 bool RegexParser::parse_regex() {
   spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
-  auto result = parse_quantified_exp();
+  auto result = parse_simple_exp();
   return result;
 }
+
+bool RegexParser::parse_simple_exp() {
+  spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
+  int backtrack_idx = current_token_idx;
+
+  auto concat = parse_concatenation_exp();
+  if (concat) {
+    spdlog::info("\tparsing concatenation_exp successful!");
+    return true;
+  }
+  current_token_idx = backtrack_idx;
+
+  auto quantified = parse_quantified_exp();
+  if (quantified) {
+    spdlog::info("\tparsing quantified_exp successful!");
+    return true;
+  }
+  current_token_idx = backtrack_idx;
+
+  return false;
+ }
+
+bool RegexParser::parse_concatenation_exp() {
+  spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
+  int backtrack_idx = current_token_idx;
+  auto quantified_exp = parse_quantified_exp();
+  // a concatenation exp needs at least one part
+  if(!quantified_exp){
+    current_token_idx = backtrack_idx;
+    return false;
+  }
+
+  backtrack_idx = current_token_idx;
+  // the other part concatenated is optional
+  auto concat_exp = parse_concatenation_exp();
+  if(!concat_exp){
+    current_token_idx = backtrack_idx;
+  }
+  return true;
+ }
+
 
 bool RegexParser::parse_quantified_exp(){
   spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
@@ -78,6 +119,7 @@ bool RegexParser::parse_quantified_exp(){
   
   // if we're this far, we know the elementary_exp succesfully parsed.
   // Hence we return true, as per the first production rule 
+  spdlog::info("\tsuccessfully parsed quantified exp without quantifier");
   return true;
 }
 
