@@ -2,6 +2,7 @@
 #define REGEXPARSER_H_
 
 #include <libbearpig/regextokens.h>
+#include <optional>
 #include <vector>
 
 class RegexParser {
@@ -25,7 +26,7 @@ private:
   int current_token_idx = 0;
   int backtrack_position = 0;
   bool invalid = false;
-  RegexToken get_next_token();
+  std::optional<RegexToken> get_next_token();
 };
 
 #endif // REGEXPARSER_H_

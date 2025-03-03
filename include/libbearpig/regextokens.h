@@ -16,10 +16,10 @@ enum class RegexTokenType {
   // Quantifiers
   STAR,
   PLUS,
+  OPTIONAL,
 
   // Choice
   ALTERNATIVE,
-  OPTIONAL,
 
   // Characters
   ANY,
