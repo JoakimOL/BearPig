@@ -37,7 +37,7 @@ bool RegexParser::parse() { return parse_regex() && is_done(); }
 bool RegexParser::parse_regex() {
   spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
   auto result = parse_quantified_exp();
-  return true;
+  return result;
 }
 
 bool RegexParser::parse_quantified_exp(){
