@@ -9,6 +9,12 @@ class RegexParser {
 public:
   bool parse();
   bool is_done() { return current_token_idx == tokenstream.size(); };
+  int get_current_token_idx() const {
+    return current_token_idx;
+  }
+  int get_size_of_tokenstream() const {
+    return tokenstream.size();
+  }
   explicit RegexParser(std::vector<RegexToken> tokenstream) : tokenstream(tokenstream) {}
 
 private:
@@ -21,6 +27,11 @@ private:
   bool parse_character();
   bool parse_any();
   bool parse_single_character_token(RegexTokenType type);
+  // XXX (jlier):
+  // create version of this with an array of RegexTokenTypes, so we can
+  // match the next character with one of several types
+  // useful for escaping metacharacters
+  // bool parse_single_character_token(std::array<RegexTokenType> type);
   bool parse_elementary_exp();
   bool parse_group();
   bool parse_set();
@@ -30,6 +41,8 @@ private:
   int backtrack_position = 0;
   bool invalid = false;
   std::optional<RegexToken> get_next_token();
+  std::optional<RegexToken> peek();
+  bool expect(std::optional<RegexToken> actual, RegexTokenType expected);
 };
 
 #endif // REGEXPARSER_H_

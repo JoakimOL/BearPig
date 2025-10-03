@@ -31,6 +31,26 @@ std::optional<RegexToken> RegexParser::get_next_token() {
   return token;
 }
 
+std::optional<RegexToken> RegexParser::peek() {
+  if (current_token_idx + 1 >= tokenstream.size()) {
+    return std::nullopt;
+  }
+  auto token = tokenstream.at(current_token_idx + 1);
+  return token;
+}
+
+bool RegexParser::expect(std::optional<RegexToken> actual,
+                         RegexTokenType expected) {
+  if (actual.has_value() && actual->tokentype == expected) {
+    spdlog::info("\tsuccessfully parsed {}",
+                 to_string(actual.value().tokentype));
+    return true;
+  }
+  spdlog::info("\texpected {}, got {}", to_string(expected),
+               to_string(actual.value().tokentype));
+  return false;
+}
+
 // top level parse function
 bool RegexParser::parse() { return parse_regex() && is_done(); }
 
@@ -95,6 +115,30 @@ bool RegexParser::parse_quantified_exp() {
   spdlog::info("\tparsing elementary_exp successful! current_token: {}",
                current_token_idx);
 
+  // auto next = peek();
+  // if (next.has_value()) {
+  //   switch (next->tokentype) {
+  //   case RegexTokenType::STAR: {
+  //     parse_single_character_token(RegexTokenType::STAR);
+  //     spdlog::info("\tsuccessfully parsed star");
+  //     return true;
+  //   }
+  //   case RegexTokenType::PLUS: {
+  //     parse_single_character_token(RegexTokenType::PLUS);
+  //     spdlog::info("\tsuccessfully parsed plus");
+  //     return true;
+  //   }
+  //   case RegexTokenType::OPTIONAL: {
+  //     parse_single_character_token(RegexTokenType::OPTIONAL);
+  //     spdlog::info("\tsuccessfully parsed optional");
+  //     return true;
+  //   }
+  //   default: {
+  //     spdlog::info("\tthis should never happen i think");
+  //     return false;
+  //   }
+  //   }
+  // }
   int backtrack_idx = current_token_idx;
 
   auto star = parse_single_character_token(RegexTokenType::STAR);
@@ -268,7 +312,21 @@ bool RegexParser::parse_group() {
   return true;
 }
 
+// XXX (jlier):
+// create version of this with an array of RegexTokenTypes, so we can
+// match the next character with one of several types
+// useful for escaping metacharacters
 bool RegexParser::parse_single_character_token(RegexTokenType type) {
+  // auto next = peek();
+  // if(!next.has_value()) {
+  //   spdlog::info("\twhile parsing {}, reached end of input.", to_string(type));
+  //   return false;
+  // }
+  // if(expect(next, type)){
+  //   next = get_next_token();
+  //   return true;
+  // }
+  // return false;
   int backtrack_idx = current_token_idx;
   auto maybe_token = get_next_token();
   RegexToken token;
@@ -291,5 +349,7 @@ bool RegexParser::parse_any() {
 
 bool RegexParser::parse_character() {
   spdlog::info("{}, current_token_idx: {}", __func__, current_token_idx);
+  // auto escape = parse_single_character_token(RegexTokenType::ESCAPE);
+  // if(!escape) parse_single_character_token(RegexTokenType::CHARACTER);
   return parse_single_character_token(RegexTokenType::CHARACTER);
 }

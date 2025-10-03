@@ -1,6 +1,7 @@
 #ifndef REGEXTOKENS_H_
 #define REGEXTOKENS_H_
 
+#include <array>
 #include <string_view>
 #include <string>
 
@@ -33,6 +34,22 @@ enum class RegexTokenType {
   INVALID,
 };
 
+static std::array metacharacters = {
+  RegexTokenType::PLUS,
+  RegexTokenType::PAREN_OPEN,
+  RegexTokenType::PAREN_CLOSE,
+  RegexTokenType::CURLY_OPEN,
+  RegexTokenType::CURLY_CLOSE,
+  RegexTokenType::SQUARE_OPEN,
+  RegexTokenType::SQUARE_CLOSE,
+  RegexTokenType::STAR,
+  RegexTokenType::PLUS,
+  RegexTokenType::OPTIONAL,
+  RegexTokenType::ALTERNATIVE,
+  RegexTokenType::ANY,
+  RegexTokenType::ESCAPE,
+};
+
 std::string to_string(RegexTokenType t);
 
 struct RegexToken {
@@ -42,5 +59,7 @@ struct RegexToken {
   // char* first;
   std::string_view data;
 };
+
+RegexToken invalid_token();
 
 #endif // REGEXTOKENS_H_
