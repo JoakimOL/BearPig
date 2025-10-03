@@ -14,12 +14,12 @@ enum class RegexTokenType {
   SQUARE_CLOSE,
 
   // Quantifiers
-  STAR,
-  PLUS,
-  OPTIONAL,
+  STAR, // a*
+  PLUS, // a+
+  OPTIONAL, // a?
 
   // Choice
-  ALTERNATIVE,
+  ALTERNATIVE, // a | b
 
   // Characters
   ANY,
