@@ -20,6 +20,12 @@ std::string to_string(RegexTokenType t) {
   case (RegexTokenType::SQUARE_CLOSE): {
     return "SQUARE_CLOSE";
   }
+  case (RegexTokenType::DASH): {
+    return "DASH";
+  }
+  case (RegexTokenType::CARET): {
+    return "CARET";
+  }
   case (RegexTokenType::STAR): {
     return "STAR";
   }
@@ -49,3 +55,5 @@ std::string to_string(RegexTokenType t) {
   }
   }
 }
+
+RegexToken invalid_token(){ return RegexToken{RegexTokenType::INVALID, 0, ""};};

@@ -23,6 +23,8 @@ private:
   bool parse_single_character_token(RegexTokenType type);
   bool parse_elementary_exp();
   bool parse_group();
+  bool parse_set();
+  bool parse_set_items();
   std::vector<RegexToken> tokenstream;
   int current_token_idx = 0;
   int backtrack_position = 0;

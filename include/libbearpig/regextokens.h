@@ -20,6 +20,8 @@ enum class RegexTokenType {
 
   // Choice
   ALTERNATIVE, // a | b
+  DASH, // [a-b] set ranges
+  CARET, // [^a-b] for negative sets
 
   // Characters
   ANY,

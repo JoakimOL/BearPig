@@ -16,6 +16,10 @@ std::vector<RegexToken> RegexScanner::tokenize() {
   while (current_column < input.size()) {
     tokens.emplace_back(next());
   }
+  for (auto token : tokens) {
+    spdlog::info("token: {} ({}) at {}", token.data,
+                 to_string(token.tokentype), token.column);
+  }
   return tokens;
 }
 
@@ -34,8 +38,18 @@ RegexToken RegexScanner::next() {
                        input.substr(current_column, 1)};
     break;
   }
+  case ('['): {
+    token = RegexToken{RegexTokenType::SQUARE_OPEN, current_column,
+                       input.substr(current_column, 1)};
+    break;
+  }
   case (')'): {
     token = RegexToken{RegexTokenType::PAREN_CLOSE, current_column,
+                       input.substr(current_column, 1)};
+    break;
+  }
+  case (']'): {
+    token = RegexToken{RegexTokenType::SQUARE_CLOSE, current_column,
                        input.substr(current_column, 1)};
     break;
   }
@@ -49,6 +63,16 @@ RegexToken RegexScanner::next() {
                        input.substr(current_column, 1)};
     break;
   }
+  case ('-'): {
+    token = RegexToken{RegexTokenType::DASH, current_column,
+                       input.substr(current_column, 1)};
+    break;
+  }
+  case ('^'): {
+    token = RegexToken{RegexTokenType::CARET, current_column,
+                       input.substr(current_column, 1)};
+    break;
+  }
   case ('|'): {
     token = RegexToken{RegexTokenType::ALTERNATIVE, current_column,
                        input.substr(current_column, 1)};
@@ -56,6 +80,11 @@ RegexToken RegexScanner::next() {
   }
   case ('+'): {
     token = RegexToken{RegexTokenType::PLUS, current_column,
+                       input.substr(current_column, 1)};
+    break;
+  }
+  case ('\\'): {
+    token = RegexToken{RegexTokenType::ESCAPE, current_column,
                        input.substr(current_column, 1)};
     break;
   }

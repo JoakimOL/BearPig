@@ -20,6 +20,22 @@ TEST(REGEXPARSER, basic_able_to_parse_groups){
   EXPECT_TRUE(rp.parse());
   EXPECT_TRUE(rp.is_done());
 }
+TEST(REGEXPARSER, basic_able_to_parse_sets){
+  RegexScanner rs{"[az]"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
+TEST(REGEXPARSER, basic_able_to_parse_sets_with_ranges){
+  RegexScanner rs{"[a-d]"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
 TEST(REGEXPARSER, basic_able_to_parse_any){
   RegexScanner rs{"."};
   

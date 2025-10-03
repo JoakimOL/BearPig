@@ -142,6 +142,15 @@ bool RegexParser::parse_elementary_exp() {
   }
   current_token_idx = backtrack_idx;
 
+  // Trying to parse set
+  backtrack_idx = current_token_idx;
+  auto set = parse_set();
+  if (set) {
+    spdlog::info("\t{}", "parsing set success!");
+    return true;
+  }
+  current_token_idx = backtrack_idx;
+
   // Trying to parse any
   spdlog::debug("\tattempting to parse any. current_token_idx: {}",
                 current_token_idx);
