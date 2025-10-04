@@ -112,3 +112,11 @@ TEST(REGEXPARSER, basic_able_to_parse_a_bunch_of_stuff){
   EXPECT_TRUE(rp.parse());
   EXPECT_TRUE(rp.is_done());
 }
+TEST(REGEXPARSER, basic_alternative){
+  RegexScanner rs{"a|b"};
+
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}

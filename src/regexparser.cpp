@@ -1,5 +1,6 @@
 #include "libbearpig/regexparser.h"
 #include "libbearpig/regextokens.h"
+#include <algorithm>
 #include <cassert>
 #include <spdlog/spdlog.h>
 
@@ -70,16 +71,31 @@ bool RegexParser::parse_top_level() {
   assert(current_token.tokentype == RegexTokenType::EOS);
   return success;
 }
-bool RegexParser::parse_exp() { return parse_simple_exp(); }
+bool RegexParser::parse_exp() { return parse_alternative(); }
+bool RegexParser::parse_alternative() {
+  bool success = parse_simple_exp();
+  spdlog::info("{}::success = {}", __func__, success);
+  if (success && current_token.tokentype == RegexTokenType::ALTERNATIVE) {
+    consume(RegexTokenType::ALTERNATIVE);
+    return parse_alternative();
+  }
+  return success;
+}
 bool RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
 bool RegexParser::parse_concatenation_exp() {
+  std::vector<RegexTokenType> types = {
+      RegexTokenType::PAREN_OPEN, RegexTokenType::SQUARE_OPEN,
+      RegexTokenType::ANY, RegexTokenType::CHARACTER};
   bool success = parse_quantified_exp();
   spdlog::info("{}::success = {}", __func__, success);
   if (current_token.tokentype == RegexTokenType::EOS)
-    return true;
-  if (success)
+    return success;
+  if (std::ranges::any_of(types, [this](RegexTokenType type) {
+        return current_token.tokentype == type;
+      })) {
     return parse_concatenation_exp();
-  return false;
+  }
+  return success;
 }
 bool RegexParser::parse_quantified_exp() {
   bool elem = parse_elementary_exp();
@@ -178,6 +194,8 @@ bool RegexParser::parse_set() {
                to_string(RegexTokenType::SQUARE_CLOSE),
                to_string(current_token.tokentype));
   consume(RegexTokenType::SQUARE_CLOSE);
+  spdlog::info("{}::successfully parsed a {}set", __func__,
+               negative ? "negative " : "");
   return true;
 }
 
