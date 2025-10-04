@@ -50,10 +50,16 @@ std::string to_string(RegexTokenType t) {
   case (RegexTokenType::WHITESPACE): {
     return "WHITESPACE";
   }
-  default: {
+  case (RegexTokenType::INVALID): {
     return "INVALID";
+  }
+  default: {
+    return "DEFUALT";
   }
   }
 }
-
-RegexToken invalid_token(){ return RegexToken{RegexTokenType::INVALID, 0, ""};};
+RegexToken invalid = RegexToken{RegexTokenType::INVALID, 0, ""};
+const RegexToken& invalid_token(){
+  return invalid;
+   // return RegexToken{RegexTokenType::INVALID, 0, ""};
+ };

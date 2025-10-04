@@ -1,4 +1,4 @@
-#include "libbearpig/regexparser.h"
+#include "libbearpig/parser.h"
 #include "libbearpig/regexscanner.h"
 #include <libbearpig/lib.h>
 #include <gtest/gtest.h>

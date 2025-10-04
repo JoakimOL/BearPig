@@ -60,6 +60,6 @@ struct RegexToken {
   std::string_view data;
 };
 
-RegexToken invalid_token();
+const RegexToken& invalid_token();
 
 #endif // REGEXTOKENS_H_
