@@ -36,6 +36,22 @@ TEST(REGEXPARSER, basic_able_to_parse_sets_with_ranges){
   EXPECT_TRUE(rp.parse());
   EXPECT_TRUE(rp.is_done());
 }
+TEST(REGEXPARSER, basic_able_to_parse_sets_with_multiple_ranges){
+  RegexScanner rs{"[a-df0-9]"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
+TEST(REGEXPARSER, basic_able_to_parse_negative_sets_with_multiple_ranges){
+  RegexScanner rs{"[^a-df0-9]"};
+  
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}
 TEST(REGEXPARSER, basic_able_to_parse_any){
   RegexScanner rs{"."};
   

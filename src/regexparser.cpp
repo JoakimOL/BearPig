@@ -168,8 +168,7 @@ bool RegexParser::parse_set() {
   consume(RegexTokenType::SQUARE_OPEN);
 
   bool negative = false;
-  auto next = peek();
-  if (next.tokentype == RegexTokenType::CARET) {
+  if (current_token.tokentype == RegexTokenType::CARET) {
     consume(RegexTokenType::CARET);
     negative = true;
   }
@@ -183,17 +182,14 @@ bool RegexParser::parse_set() {
 }
 
 bool RegexParser::parse_set_items() {
-  auto next = peek();
-  while (next.tokentype == RegexTokenType::CHARACTER) {
+  while (current_token.tokentype == RegexTokenType::CHARACTER) {
     parse_set_item();
-    next = peek();
   }
   return true;
 }
 bool RegexParser::parse_set_item() {
   consume(RegexTokenType::CHARACTER);
-  auto next = peek();
-  if (next.tokentype == RegexTokenType::DASH) {
+  if (current_token.tokentype == RegexTokenType::DASH) {
     consume(RegexTokenType::DASH);
     consume(RegexTokenType::CHARACTER);
   }
