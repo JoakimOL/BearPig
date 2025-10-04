@@ -112,9 +112,7 @@ bool RegexParser::parse_elementary_exp() {
     break;
   }
   case (RegexTokenType::ANY): {
-    consume(__func__, RegexTokenType::ANY);
-    // return parse_any();
-    return true;
+    return parse_any();
     break;
   }
   case (RegexTokenType::SQUARE_OPEN): {
@@ -169,7 +167,6 @@ bool RegexParser::parse_set() {
                to_string(current_token.tokentype));
   consume(RegexTokenType::SQUARE_OPEN);
 
-  // parse_top_level();
   bool negative = false;
   auto next = peek();
   if (next.tokentype == RegexTokenType::CARET) {
