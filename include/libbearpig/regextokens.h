@@ -30,6 +30,7 @@ enum class RegexTokenType {
   CHARACTER,
   ESCAPE,
 
+  EOS,
   // maybe a good idea?
   INVALID,
 };

@@ -50,6 +50,9 @@ std::string to_string(RegexTokenType t) {
   case (RegexTokenType::WHITESPACE): {
     return "WHITESPACE";
   }
+  case (RegexTokenType::EOS): {
+    return "EOS";
+  }
   case (RegexTokenType::INVALID): {
     return "INVALID";
   }

@@ -1,5 +1,6 @@
 #include "libbearpig/parser.h"
 #include "libbearpig/regextokens.h"
+#include <cassert>
 #include <spdlog/spdlog.h>
 
 void RegexParser::end_of_input_error() {
@@ -35,7 +36,7 @@ void RegexParser::advance() {
     current_token = tokenstream.at(current_token_idx);
   } else {
     spdlog::info("is this being run?");
-    current_token = invalid_token();
+    current_token = RegexToken{RegexTokenType::EOS, current_token_idx, ""};
   }
 }
 
@@ -64,9 +65,22 @@ bool RegexParser::parse() {
   return parse_top_level();
 }
 
-bool RegexParser::parse_top_level() { return parse_exp(); }
+bool RegexParser::parse_top_level() {
+  parse_exp();
+  assert(current_token.tokentype == RegexTokenType::EOS);
+  return true;
+}
 bool RegexParser::parse_exp() { return parse_simple_exp(); }
-bool RegexParser::parse_simple_exp() { return parse_quantified_exp(); }
+bool RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
+bool RegexParser::parse_concatenation_exp() {
+  bool success = parse_quantified_exp();
+  spdlog::info("{}::success = {}", __func__, success);
+  if (current_token.tokentype == RegexTokenType::EOS)
+    return true;
+  if (success)
+    return parse_concatenation_exp();
+  return false;
+}
 bool RegexParser::parse_quantified_exp() {
   bool elem = parse_elementary_exp();
   switch (current_token.tokentype) {
@@ -99,20 +113,24 @@ bool RegexParser::parse_elementary_exp() {
   }
   case (RegexTokenType::ANY): {
     consume(__func__, RegexTokenType::ANY);
+    // return parse_any();
+    return true;
     break;
   }
   case (RegexTokenType::SQUARE_OPEN): {
     return parse_set();
     break;
   }
-  default:
+  case (RegexTokenType::CHARACTER): {
     while (current_token.tokentype == RegexTokenType::CHARACTER) {
       consume(__func__, RegexTokenType::CHARACTER);
     }
+    return true;
     break;
   }
-
-  return true;
+  default:
+    return false;
+  }
 }
 
 bool RegexParser::parse_character() {
@@ -136,7 +154,7 @@ bool RegexParser::parse_group() {
                to_string(current_token.tokentype));
   consume(RegexTokenType::PAREN_OPEN);
 
-  parse_top_level();
+  parse_exp();
 
   spdlog::info("{}::expecting {}, current_token: {}", __func__,
                to_string(RegexTokenType::PAREN_CLOSE),

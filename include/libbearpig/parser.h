@@ -25,6 +25,7 @@ private:
   bool parse_top_level();
   bool parse_exp();
   bool parse_simple_exp();
+  bool parse_concatenation_exp();
   bool parse_quantified_exp();
   bool parse_elementary_exp();
   bool parse_alternative();
