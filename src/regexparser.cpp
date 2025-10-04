@@ -66,9 +66,9 @@ bool RegexParser::parse() {
 }
 
 bool RegexParser::parse_top_level() {
-  parse_exp();
+  bool success = parse_exp();
   assert(current_token.tokentype == RegexTokenType::EOS);
-  return true;
+  return success;
 }
 bool RegexParser::parse_exp() { return parse_simple_exp(); }
 bool RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
