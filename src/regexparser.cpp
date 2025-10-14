@@ -53,6 +53,8 @@ void RegexParser::consume(std::string_view func, RegexTokenType expected) {
   }
 }
 
+#define consume_wf(expected) (consume((__func__), (expected)))
+
 const RegexToken &RegexParser::peek() {
   if (current_token_idx + 1 < tokenstream.size()) {
     return tokenstream.at(current_token_idx);
@@ -76,7 +78,7 @@ bool RegexParser::parse_alternative() {
   bool success = parse_simple_exp();
   spdlog::info("{}::success = {}", __func__, success);
   if (success && current_token.tokentype == RegexTokenType::ALTERNATIVE) {
-    consume(RegexTokenType::ALTERNATIVE);
+    consume_wf(RegexTokenType::ALTERNATIVE);
     return parse_alternative();
   }
   return success;
@@ -101,15 +103,15 @@ bool RegexParser::parse_quantified_exp() {
   bool elem = parse_elementary_exp();
   switch (current_token.tokentype) {
   case (RegexTokenType::STAR): {
-    consume(RegexTokenType::STAR);
+    consume_wf(RegexTokenType::STAR);
     break;
   }
   case (RegexTokenType::PLUS): {
-    consume(RegexTokenType::PLUS);
+    consume_wf(RegexTokenType::PLUS);
     break;
   }
   case (RegexTokenType::OPTIONAL): {
-    consume(RegexTokenType::OPTIONAL);
+    consume_wf(RegexTokenType::OPTIONAL);
     break;
   }
   default:
@@ -151,49 +153,34 @@ bool RegexParser::parse_character() {
   spdlog::info("{}::expecting {}, current_token: {}", __func__,
                to_string(RegexTokenType::CHARACTER),
                to_string(current_token.tokentype));
-  consume(__func__, RegexTokenType::CHARACTER);
+  consume_wf(RegexTokenType::CHARACTER);
   return true;
 }
 
 bool RegexParser::parse_any() {
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
-               to_string(RegexTokenType::ANY),
-               to_string(current_token.tokentype));
-  consume(RegexTokenType::ANY);
+  consume_wf(RegexTokenType::ANY);
   return true;
 }
 bool RegexParser::parse_group() {
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
-               to_string(RegexTokenType::PAREN_OPEN),
-               to_string(current_token.tokentype));
-  consume(RegexTokenType::PAREN_OPEN);
+  consume_wf(RegexTokenType::PAREN_OPEN);
 
   parse_exp();
 
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
-               to_string(RegexTokenType::PAREN_CLOSE),
-               to_string(current_token.tokentype));
-  consume(RegexTokenType::PAREN_CLOSE);
+  consume_wf(RegexTokenType::PAREN_CLOSE);
   return true;
 }
 
 bool RegexParser::parse_set() {
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
-               to_string(RegexTokenType::SQUARE_OPEN),
-               to_string(current_token.tokentype));
-  consume(RegexTokenType::SQUARE_OPEN);
+  consume_wf(RegexTokenType::SQUARE_OPEN);
 
   bool negative = false;
   if (current_token.tokentype == RegexTokenType::CARET) {
-    consume(RegexTokenType::CARET);
+    consume_wf(RegexTokenType::CARET);
     negative = true;
   }
   parse_set_items();
 
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
-               to_string(RegexTokenType::SQUARE_CLOSE),
-               to_string(current_token.tokentype));
-  consume(RegexTokenType::SQUARE_CLOSE);
+  consume_wf(RegexTokenType::SQUARE_CLOSE);
   spdlog::info("{}::successfully parsed a {}set", __func__,
                negative ? "negative " : "");
   return true;
@@ -206,10 +193,10 @@ bool RegexParser::parse_set_items() {
   return true;
 }
 bool RegexParser::parse_set_item() {
-  consume(RegexTokenType::CHARACTER);
+  consume_wf(RegexTokenType::CHARACTER);
   if (current_token.tokentype == RegexTokenType::DASH) {
-    consume(RegexTokenType::DASH);
-    consume(RegexTokenType::CHARACTER);
+    consume_wf(RegexTokenType::DASH);
+    consume_wf(RegexTokenType::CHARACTER);
   }
   return true;
 }
