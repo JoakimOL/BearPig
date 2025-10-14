@@ -40,7 +40,6 @@ private:
   void unexpected_token_error(std::string_view func,
                               const RegexTokenType &expected);
   void advance();
-  const RegexToken &peek();
   void consume(RegexTokenType expected);
   void consume(std::string_view func, RegexTokenType expected);
   void print_error_message_and_exit(const std::string &, int loc);

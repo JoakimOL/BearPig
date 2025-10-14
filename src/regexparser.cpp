@@ -65,13 +65,6 @@ void RegexParser::consume(std::string_view func, RegexTokenType expected) {
 
 #define consume_wf(expected) (consume((__func__), (expected)))
 
-const RegexToken &RegexParser::peek() {
-  if (current_token_idx + 1 < tokenstream.size()) {
-    return tokenstream.at(current_token_idx);
-  }
-  return invalid_token();
-}
-
 bool RegexParser::parse() {
   spdlog::info("{}::current_token: {} idx: {}", __func__,
                to_string(current_token.tokentype), current_token_idx);
