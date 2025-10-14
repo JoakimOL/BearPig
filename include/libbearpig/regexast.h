@@ -29,6 +29,11 @@ struct RChar : public ElementaryExp {
   std::string to_string() { return std::string(character.data); }
 };
 
+struct EscapeSeq : public RChar {
+  ~EscapeSeq() = default;
+  void apply(BaseVisitor *v) override;
+};
+
 struct SetItem : public Visitable {
   ~SetItem() = default;
   void apply(BaseVisitor *v) override;
@@ -116,7 +121,6 @@ struct ConcatExp : public Visitable {
       exps.push_back(std::move(e));
     }
   }
-
 };
 
 struct AlternativeExp : public Visitable {

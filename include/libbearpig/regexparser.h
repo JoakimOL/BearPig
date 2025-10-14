@@ -37,6 +37,7 @@ private:
   std::vector<SetItem> parse_set_items();
   SetItem parse_set_item();
   RChar parse_character(bool single = false);
+  EscapeSeq parse_escape_seq();
 
   void end_of_input_error();
   void unexpected_token_error(std::string_view func,

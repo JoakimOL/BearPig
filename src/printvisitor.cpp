@@ -52,3 +52,8 @@ void PrintVisitor::visit(AnyExp &exp) {
   spdlog::info("{}{} (depth: {})", indentation, "Any", depth);
   return;
 }
+void PrintVisitor::visit(EscapeSeq &exp) {
+  std::string indentation = fmt::format("{: >{}}", "", depth);
+  spdlog::info("{}{}: {} (depth: {})", indentation, "Escape", exp.character.data, depth);
+  return;
+}

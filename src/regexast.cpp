@@ -41,3 +41,5 @@ void SetItem::apply(BaseVisitor *v) { v->visit(*this); }
 void RChar::apply(BaseVisitor *v) { v->visit(*this); }
 
 void AnyExp::apply(BaseVisitor *v) { v->visit(*this); }
+
+void EscapeSeq::apply(BaseVisitor *v) { v->visit(*this); }

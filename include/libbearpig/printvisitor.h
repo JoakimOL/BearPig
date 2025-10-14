@@ -13,6 +13,7 @@ public:
   void visit(SetItem &) override;
   void visit(RChar &) override;
   void visit(AnyExp &) override;
+  void visit(EscapeSeq &) override;
 };
 
 #endif // PRINTVISITOR_H__

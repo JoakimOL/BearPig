@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
   // std::string input("((a|abab)*b+)?");
   // std::string input("(a)");
-  std::string input(R"([abc]\[)");
+  std::string input(R"([abc\[]\[)");
   argparse::ArgumentParser program(argv[0]);
   program.add_argument("input").help("input regex to use").remaining();
   program.add_argument("-v").flag().help("enable verbose logging");

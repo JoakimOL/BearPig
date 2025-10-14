@@ -9,6 +9,7 @@ class SetExp;
 class SetItem;
 class RChar;
 class AnyExp;
+class EscapeSeq;
 
 class BaseVisitor {
 public:
@@ -20,6 +21,7 @@ public:
   virtual void visit(SetItem &) = 0;
   virtual void visit(RChar &) = 0;
   virtual void visit(AnyExp &) = 0;
+  virtual void visit(EscapeSeq &) = 0;
   int depth{0};
   void inc_depth() { depth++; }
   void dec_depth() { depth--; }
