@@ -25,14 +25,6 @@ fetchcontent_declare(
 
 fetchcontent_makeavailable(spdlog)
 
-fetchcontent_declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 9cf9f38
-)
-
-fetchcontent_makeavailable(spdlog)
-
 target_link_libraries(libbearpig PRIVATE
   spdlog::spdlog
   fmt

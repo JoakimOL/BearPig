@@ -28,6 +28,14 @@ fetchcontent_declare(
 )
 fetchcontent_makeavailable(argparse)
 
+fetchcontent_declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 9cf9f38
+)
+
+fetchcontent_makeavailable(fmt)
+
 # library code is here
 add_subdirectory(src)
 

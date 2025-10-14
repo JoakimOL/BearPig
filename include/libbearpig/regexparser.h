@@ -2,7 +2,6 @@
 #define REGEXPARSER_H_
 
 #include <libbearpig/regextokens.h>
-#include <spdlog/spdlog.h>
 #include <vector>
 
 class RegexParser {
