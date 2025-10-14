@@ -4,6 +4,15 @@
 #include <cassert>
 #include <spdlog/spdlog.h>
 
+namespace {
+
+void print_expected(std::string_view func, RegexTokenType expected, RegexTokenType actual) {
+    spdlog::debug("{}::expecting {}, current_token: {}", func,
+               to_string(expected), to_string(actual));
+}
+
+} // unnamed ns
+
 void RegexParser::end_of_input_error() {
   print_error_message_and_exit(
       fmt::format("Parser unexpectedly reached end of input"),
@@ -13,7 +22,7 @@ void RegexParser::end_of_input_error() {
 void RegexParser::unexpected_token_error(std::string_view func,
                                          const RegexTokenType &expected) {
   print_error_message_and_exit(
-      fmt::format("Unexpected token in {}: got {}, expected: {}", func,
+      fmt::format("Unexpected token at {} in {}: got {}, expected: {}", current_token_idx, func,
                   to_string(current_token.tokentype), to_string(expected)),
       current_token_idx);
 }
@@ -23,9 +32,9 @@ void RegexParser::print_error_message_and_exit(const std::string &msg,
   std::stringstream ss;
   std::for_each(tokenstream.cbegin(), tokenstream.cend(),
                 [&ss](RegexToken t) { ss << t.data; });
-  spdlog::error(ss.str());
-  spdlog::error("{:~>{}}", "^", loc);
   spdlog::error(msg);
+  spdlog::error(ss.str());
+  spdlog::error("\033[31m{:~>{}}\033[0m", "^", loc+1);
   exit(1);
 }
 
@@ -46,6 +55,7 @@ void RegexParser::consume(RegexTokenType expected) {
 }
 
 void RegexParser::consume(std::string_view func, RegexTokenType expected) {
+  print_expected(func, expected, current_token.tokentype);
   if (current_token.tokentype == expected) {
     advance();
   } else {
