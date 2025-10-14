@@ -38,6 +38,8 @@ int main(int argc, char** argv) {
   RegexParser regex_parser{tokens};
   if (regex_parser.parse()) {
     spdlog::info("successful parse!");
+    auto top = regex_parser.get_top_of_expression();
+    spdlog::info("num alternatives: {}", top.alternatives.size());
   }
   else {
     spdlog::warn("unsuccessful parse");
