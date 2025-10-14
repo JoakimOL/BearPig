@@ -1,5 +1,4 @@
 set(HEADER_LIST 
-  "${bearpig_SOURCE_DIR}/include/libbearpig/lib.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexscanner.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regextokens.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexparser.h"
@@ -7,7 +6,6 @@ set(HEADER_LIST
 )
 
 add_library(libbearpig
-   lib.cpp
    regexscanner.cpp
    regextokens.cpp
    regexparser.cpp
