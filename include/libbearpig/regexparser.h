@@ -34,6 +34,7 @@ private:
   bool parse_set();
   bool parse_set_items();
   bool parse_set_item();
+  bool parse_escape_seq();
   // bool parse_top_level();
 
   void end_of_input_error();

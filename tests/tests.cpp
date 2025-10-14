@@ -120,3 +120,12 @@ TEST(REGEXPARSER, basic_alternative){
   EXPECT_TRUE(rp.parse());
   EXPECT_TRUE(rp.is_done());
 }
+
+TEST(REGEXPARSER, basic_escape_sequence){
+  RegexScanner rs{R"(a\\)"};
+
+  RegexParser rp{rs.tokenize()};
+  EXPECT_TRUE(rs.is_at_end());
+  EXPECT_TRUE(rp.parse());
+  EXPECT_TRUE(rp.is_done());
+}

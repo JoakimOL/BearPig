@@ -56,6 +56,9 @@ std::string to_string(RegexTokenType t) {
   case (RegexTokenType::INVALID): {
     return "INVALID";
   }
+  case (RegexTokenType::ACCEPT_ANY): {
+    return "anything";
+  }
   default: {
     return "DEFUALT";
   }

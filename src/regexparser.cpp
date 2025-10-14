@@ -56,7 +56,7 @@ void RegexParser::consume(RegexTokenType expected) {
 
 void RegexParser::consume(std::string_view func, RegexTokenType expected) {
   print_expected(func, expected, current_token.tokentype);
-  if (current_token.tokentype == expected) {
+  if (current_token.tokentype == expected or expected == RegexTokenType::ACCEPT_ANY) {
     advance();
   } else {
     unexpected_token_error(func, expected);
@@ -97,7 +97,7 @@ bool RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
 bool RegexParser::parse_concatenation_exp() {
   std::vector<RegexTokenType> types = {
       RegexTokenType::PAREN_OPEN, RegexTokenType::SQUARE_OPEN,
-      RegexTokenType::ANY, RegexTokenType::CHARACTER};
+      RegexTokenType::ANY, RegexTokenType::CHARACTER, RegexTokenType::ESCAPE};
   bool success = parse_quantified_exp();
   spdlog::info("{}::success = {}", __func__, success);
   if (current_token.tokentype == RegexTokenType::EOS)
@@ -148,22 +148,35 @@ bool RegexParser::parse_elementary_exp() {
     break;
   }
   case (RegexTokenType::CHARACTER): {
-    while (current_token.tokentype == RegexTokenType::CHARACTER) {
-      consume(__func__, RegexTokenType::CHARACTER);
-    }
-    return true;
+    return parse_character();
     break;
+  }
+  case (RegexTokenType::ESCAPE): {
+    return parse_escape_seq();
   }
   default:
     return false;
   }
 }
 
+bool RegexParser::parse_escape_seq() {
+  spdlog::info("{}::current {} next: {}", __func__,
+               to_string(current_token.tokentype),
+               to_string(tokenstream.at(current_token_idx + 1).tokentype));
+  consume_wf(RegexTokenType::ESCAPE);
+  auto escaped_token = current_token;
+  consume_wf(RegexTokenType::ACCEPT_ANY);
+  spdlog::info("{}::escaped token: '{}' ({})", __func__, escaped_token.data, to_string(escaped_token.tokentype));
+  return true;
+}
+
 bool RegexParser::parse_character() {
   spdlog::info("{}::expecting {}, current_token: {}", __func__,
                to_string(RegexTokenType::CHARACTER),
                to_string(current_token.tokentype));
-  consume_wf(RegexTokenType::CHARACTER);
+  while (current_token.tokentype == RegexTokenType::CHARACTER) {
+    consume_wf(RegexTokenType::CHARACTER);
+  }
   return true;
 }
 

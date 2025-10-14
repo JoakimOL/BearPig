@@ -31,8 +31,10 @@ enum class RegexTokenType {
   ESCAPE,
 
   EOS,
+
   // maybe a good idea?
   INVALID,
+  ACCEPT_ANY,
 };
 
 static std::array metacharacters = {
