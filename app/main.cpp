@@ -1,15 +1,34 @@
-#include "libbearpig/regexparser.h"
+#include <exception>
 #include <libbearpig/lib.h>
 #include <libbearpig/nfa.h>
 #include <libbearpig/regexscanner.h>
+#include <libbearpig/regexparser.h>
+
+#include <argparse/argparse.hpp>
 
 int main(int argc, char** argv) {
   // std::string input("((a|abab)*b+)?");
   // std::string input("(a)");
-  std::string input("(abcdef)[abc][^def]");
-  if(argc > 1){
-    input = argv[1];
+  std::string input(R"([abc]\[)");
+  argparse::ArgumentParser program(argv[0]);
+  program.add_argument("input").help("input regex to use").remaining();
+  program.add_argument("-v").flag().help("enable verbose logging");
+
+  try {
+    program.parse_args(argc, argv);
+  } catch (const std::exception& e) {
+    spdlog::error(e.what());
+    exit(1);
   }
+
+  if(program.is_used("-v")){
+    spdlog::set_level(spdlog::level::debug);
+  }
+
+  if(program.is_used("input")){
+    input = program.get<std::string>("input");
+  }
+  
   RegexScanner scanner{input};
   auto tokens = scanner.tokenize();
   // for (auto token : tokens) {
