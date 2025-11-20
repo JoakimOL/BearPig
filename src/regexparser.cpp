@@ -2,7 +2,6 @@
 #include "libbearpig/regexast.h"
 #include "libbearpig/regextokens.h"
 #include <algorithm>
-#include <cassert>
 #include <memory>
 #include <span>
 #include <spdlog/spdlog.h>
@@ -79,7 +78,7 @@ bool RegexParser::parse() {
 bool RegexParser::parse_top_level() {
   std::unique_ptr<AlternativeExp> exp =
       std::make_unique<AlternativeExp>(parse_exp());
-  assert(current_token.tokentype == RegexTokenType::EOS);
+  if(current_token.tokentype != RegexTokenType::EOS || !is_done()) return false;
   expression_top.swap(exp);
   return true;
 }
