@@ -78,7 +78,7 @@ bool RegexParser::parse() {
 bool RegexParser::parse_top_level() {
   std::unique_ptr<AlternativeExp> exp =
       std::make_unique<AlternativeExp>(parse_exp());
-  if(current_token.tokentype != RegexTokenType::EOS || !is_done()) return false;
+  if(current_token.tokentype != RegexTokenType::EOS || !is_done()) unexpected_token_error(__func__, RegexTokenType::EOS);
   expression_top.swap(exp);
   return true;
 }
