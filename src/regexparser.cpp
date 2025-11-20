@@ -181,23 +181,9 @@ RChar RegexParser::parse_character(bool single) {
                to_string(RegexTokenType::CHARACTER),
                to_string(current_token.tokentype));
   RChar character;
-  character.start = current_token_idx;
-  // XXX: Is a separate function or an overload better here?
-  if (single) {
-    consume_wf(RegexTokenType::CHARACTER);
-    character.end = current_token_idx;
-    character.characters =
-        std::span<RegexToken>{tokenstream.begin() + character.start,
-                              tokenstream.begin() + character.end};
-    return character;
-  }
-  while (current_token.tokentype == RegexTokenType::CHARACTER) {
-    consume_wf(RegexTokenType::CHARACTER);
-  }
-  character.end = current_token_idx;
-  character.characters =
-      std::span<RegexToken>{tokenstream.begin() + character.start,
-                            tokenstream.begin() + character.end};
+  character.idx = current_token_idx;
+  character.character = tokenstream.at(current_token_idx);
+  consume_wf(RegexTokenType::CHARACTER);
   return character;
 }
 

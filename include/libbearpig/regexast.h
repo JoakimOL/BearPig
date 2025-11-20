@@ -24,17 +24,9 @@ struct AnyExp : public ElementaryExp {
 struct RChar : public ElementaryExp {
   ~RChar() = default;
   void apply(BaseVisitor *v) override;
-  int start;
-  int end;
-  std::span<RegexToken> characters;
-  std::string to_string() {
-    std::string to_print =
-        std::accumulate(characters.begin(), characters.end(), std::string(""),
-                        [](std::string accumulator, RegexToken r) {
-                          return accumulator + std::string(r.data);
-                        });
-    return to_print;
-  }
+  int idx;
+  RegexToken character;
+  std::string to_string() { return std::string(character.data); }
 };
 
 struct SetItem : public Visitable {
