@@ -60,7 +60,7 @@ struct GroupExp : public ElementaryExp {
 };
 
 struct QuantifiedExp : public Visitable {
-  QuantifiedExp(QuantifiedExp &&other) : exp(std::move(other.exp)) {}
+  QuantifiedExp(QuantifiedExp &&other) : exp(std::move(other.exp)), quantifier(other.quantifier) {}
   explicit QuantifiedExp(const QuantifiedExp &other) = delete;
   explicit QuantifiedExp() = default;
   QuantifiedExp &operator=(const QuantifiedExp &other) = delete;
@@ -77,7 +77,7 @@ struct QuantifiedExp : public Visitable {
     PLUS,
     OPTIONAL,
   };
-  std::string to_string(Quantifier q) {
+  static std::string to_string(Quantifier q) {
     switch (q) {
     case (QuantifiedExp::Quantifier::NONE): {
       return "NONE";
@@ -94,7 +94,7 @@ struct QuantifiedExp : public Visitable {
     }
   }
 
-  Quantifier quantifier;
+  Quantifier quantifier = Quantifier::NONE;
   std::unique_ptr<ElementaryExp> exp;
 };
 
