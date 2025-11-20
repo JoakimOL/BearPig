@@ -1,14 +1,18 @@
 #include "libbearpig/regexparser.h"
+#include "libbearpig/regexast.h"
 #include "libbearpig/regextokens.h"
 #include <algorithm>
 #include <cassert>
+#include <memory>
+#include <span>
 #include <spdlog/spdlog.h>
 
 namespace {
 
-void print_expected(std::string_view func, RegexTokenType expected, RegexTokenType actual) {
-    spdlog::debug("{}::expecting {}, current_token: {}", func,
-               to_string(expected), to_string(actual));
+void print_expected(std::string_view func, RegexTokenType expected,
+                    RegexTokenType actual) {
+  spdlog::debug("{}::expecting {}, current_token: {}", func,
+                to_string(expected), to_string(actual));
 }
 
 } // unnamed ns
@@ -22,8 +26,9 @@ void RegexParser::end_of_input_error() {
 void RegexParser::unexpected_token_error(std::string_view func,
                                          const RegexTokenType &expected) {
   print_error_message_and_exit(
-      fmt::format("Unexpected token at {} in {}: got {}, expected: {}", current_token_idx, func,
-                  to_string(current_token.tokentype), to_string(expected)),
+      fmt::format("Unexpected token at {} in {}: got {}, expected: {}",
+                  current_token_idx, func, to_string(current_token.tokentype),
+                  to_string(expected)),
       current_token_idx);
 }
 
@@ -34,7 +39,7 @@ void RegexParser::print_error_message_and_exit(const std::string &msg,
                 [&ss](RegexToken t) { ss << t.data; });
   spdlog::error(msg);
   spdlog::error(ss.str());
-  spdlog::error("\033[31m{:~>{}}\033[0m", "^", loc+1);
+  spdlog::error("\033[31m{:~>{}}\033[0m", "^", loc + 1);
   exit(1);
 }
 
@@ -72,134 +77,183 @@ bool RegexParser::parse() {
 }
 
 bool RegexParser::parse_top_level() {
-  bool success = parse_exp();
+  std::unique_ptr<AlternativeExp> exp =
+      std::make_unique<AlternativeExp>(parse_exp());
   assert(current_token.tokentype == RegexTokenType::EOS);
-  return success;
+  expression_top.swap(exp);
+  return true;
 }
-bool RegexParser::parse_exp() { return parse_alternative(); }
-bool RegexParser::parse_alternative() {
-  bool success = parse_simple_exp();
-  spdlog::info("{}::success = {}", __func__, success);
-  if (success && current_token.tokentype == RegexTokenType::ALTERNATIVE) {
+
+AlternativeExp RegexParser::parse_exp() { return parse_alternative(); }
+
+AlternativeExp RegexParser::parse_alternative() {
+  AlternativeExp alternative;
+  ConcatExp first = parse_simple_exp();
+  alternative.alternatives.push_back(std::move(first));
+
+  if (current_token.tokentype == RegexTokenType::ALTERNATIVE) {
     consume_wf(RegexTokenType::ALTERNATIVE);
-    return parse_alternative();
+    AlternativeExp next = parse_alternative();
+    for (ConcatExp &e : next.alternatives) {
+      alternative.alternatives.push_back(std::move(e));
+    }
   }
-  return success;
+  return alternative;
 }
-bool RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
-bool RegexParser::parse_concatenation_exp() {
+
+ConcatExp RegexParser::parse_simple_exp() { return parse_concatenation_exp(); }
+
+ConcatExp RegexParser::parse_concatenation_exp() {
   std::vector<RegexTokenType> types = {
       RegexTokenType::PAREN_OPEN, RegexTokenType::SQUARE_OPEN,
       RegexTokenType::ANY, RegexTokenType::CHARACTER};
-  bool success = parse_quantified_exp();
-  spdlog::info("{}::success = {}", __func__, success);
+  QuantifiedExp quantified_exp = parse_quantified_exp();
+  ConcatExp concat;
+  concat.exps.push_back(std::move(quantified_exp));
   if (current_token.tokentype == RegexTokenType::EOS)
-    return success;
-  if (std::ranges::any_of(types, [this](RegexTokenType type) {
-        return current_token.tokentype == type;
-      })) {
-    return parse_concatenation_exp();
+    return concat;
+  while (std::ranges::any_of(types, [this](RegexTokenType type) {
+    return current_token.tokentype == type;
+  })) {
+    ConcatExp next_concat = parse_concatenation_exp();
+    concat.merge(next_concat);
   }
-  return success;
+  return concat;
 }
-bool RegexParser::parse_quantified_exp() {
-  bool elem = parse_elementary_exp();
+
+QuantifiedExp RegexParser::parse_quantified_exp() {
+  QuantifiedExp quantified_exp{};
+  // std::unique_ptr<ElementaryExp> elem = parse_elementary_exp();
+  auto e = parse_elementary_exp();
+  quantified_exp.exp = std::move(e);
   switch (current_token.tokentype) {
   case (RegexTokenType::STAR): {
     consume_wf(RegexTokenType::STAR);
+    quantified_exp.quantifier = QuantifiedExp::Quantifier::STAR;
     break;
   }
   case (RegexTokenType::PLUS): {
     consume_wf(RegexTokenType::PLUS);
+    quantified_exp.quantifier = QuantifiedExp::Quantifier::PLUS;
     break;
   }
   case (RegexTokenType::OPTIONAL): {
     consume_wf(RegexTokenType::OPTIONAL);
+    quantified_exp.quantifier = QuantifiedExp::Quantifier::OPTIONAL;
     break;
   }
   default:
+    // It's okay to not have a quantifier
     break;
   }
 
-  return elem;
+  return quantified_exp;
 }
 
-bool RegexParser::parse_elementary_exp() {
+std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
   spdlog::info("{}::current_token: {} ({}) at {}", __func__, current_token.data,
                to_string(current_token.tokentype), current_token.column);
   switch (current_token.tokentype) {
   case (RegexTokenType::PAREN_OPEN): {
-    return parse_group();
-    break;
+    return std::make_unique<GroupExp>(parse_group());
   }
   case (RegexTokenType::ANY): {
-    return parse_any();
-    break;
+    return std::make_unique<AnyExp>(parse_any());
   }
   case (RegexTokenType::SQUARE_OPEN): {
-    return parse_set();
-    break;
+    return std::make_unique<SetExp>(parse_set());
   }
   case (RegexTokenType::CHARACTER): {
-    while (current_token.tokentype == RegexTokenType::CHARACTER) {
-      consume(__func__, RegexTokenType::CHARACTER);
-    }
-    return true;
-    break;
+    return std::make_unique<RChar>(parse_character());
+    // RChar ch = parse_character();
+    // for(RegexToken tok: ch.characters){
+    //   spdlog::info("{}", tok.data);
+    // }
+    // return ch;
   }
   default:
-    return false;
+    unexpected_token_error(__func__, RegexTokenType::ANY);
+    return {};
   }
 }
 
-bool RegexParser::parse_character() {
+RChar RegexParser::parse_character(bool single) {
   spdlog::info("{}::expecting {}, current_token: {}", __func__,
                to_string(RegexTokenType::CHARACTER),
                to_string(current_token.tokentype));
-  consume_wf(RegexTokenType::CHARACTER);
-  return true;
+  RChar character;
+  character.start = current_token_idx;
+  // XXX: Is a separate function or an overload better here?
+  if (single) {
+    consume_wf(RegexTokenType::CHARACTER);
+    character.end = current_token_idx;
+    character.characters =
+        std::span<RegexToken>{tokenstream.begin() + character.start,
+                              tokenstream.begin() + character.end};
+    return character;
+  }
+  while (current_token.tokentype == RegexTokenType::CHARACTER) {
+    consume_wf(RegexTokenType::CHARACTER);
+  }
+  character.end = current_token_idx;
+  character.characters =
+      std::span<RegexToken>{tokenstream.begin() + character.start,
+                            tokenstream.begin() + character.end};
+  return character;
 }
 
-bool RegexParser::parse_any() {
+AnyExp RegexParser::parse_any() {
   consume_wf(RegexTokenType::ANY);
-  return true;
+  return AnyExp{};
 }
-bool RegexParser::parse_group() {
+
+GroupExp RegexParser::parse_group() {
   consume_wf(RegexTokenType::PAREN_OPEN);
 
-  parse_exp();
+  GroupExp group;
+  group.subExp = std::make_unique<AlternativeExp>(parse_exp());
 
   consume_wf(RegexTokenType::PAREN_CLOSE);
-  return true;
+  return group;
 }
 
-bool RegexParser::parse_set() {
+SetExp RegexParser::parse_set() {
+  spdlog::info("{}::attempting to parse set", __func__);
   consume_wf(RegexTokenType::SQUARE_OPEN);
+  SetExp e;
 
-  bool negative = false;
   if (current_token.tokentype == RegexTokenType::CARET) {
     consume_wf(RegexTokenType::CARET);
-    negative = true;
+    e.negative = true;
   }
-  parse_set_items();
+  e.items = std::move(parse_set_items());
 
   consume_wf(RegexTokenType::SQUARE_CLOSE);
   spdlog::info("{}::successfully parsed a {}set", __func__,
-               negative ? "negative " : "");
-  return true;
+               e.negative ? "negative " : "");
+  return e;
 }
 
-bool RegexParser::parse_set_items() {
+std::vector<SetItem> RegexParser::parse_set_items() {
+  std::vector<SetItem> items;
   while (current_token.tokentype == RegexTokenType::CHARACTER) {
-    parse_set_item();
+    items.emplace_back(std::move(parse_set_item()));
   }
-  return true;
+  return items;
 }
-bool RegexParser::parse_set_item() {
-  consume_wf(RegexTokenType::CHARACTER);
+
+SetItem RegexParser::parse_set_item() {
+  spdlog::info("{}::attempting to a parse set item!", __func__);
+  SetItem item;
+
+  item.start = std::move(parse_character(true));
   if (current_token.tokentype == RegexTokenType::DASH) {
     consume_wf(RegexTokenType::DASH);
-    consume_wf(RegexTokenType::CHARACTER);
+    item.range = true;
+    item.stop = parse_character(true);
   }
-  return true;
+  spdlog::info("{}::parsed a {}set item! start:{}{}", __func__,
+               item.range ? "range " : "", item.start.to_string(),
+               item.range ? fmt::format("-{}", item.stop.to_string()) : "");
+  return item;
 }

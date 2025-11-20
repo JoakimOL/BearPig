@@ -2,14 +2,19 @@ set(HEADER_LIST
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexscanner.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regextokens.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexparser.h"
+  "${bearpig_SOURCE_DIR}/include/libbearpig/regexast.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/nfa.h"
+  "${bearpig_SOURCE_DIR}/include/libbearpig/basevisitor.h"
+  "${bearpig_SOURCE_DIR}/include/libbearpig/printvisitor.h"
 )
 
 add_library(libbearpig
    regexscanner.cpp
    regextokens.cpp
    regexparser.cpp
+   regexast.cpp
    nfa.cpp
+   printvisitor.cpp
    ${HEADER_LIST}
  )
 

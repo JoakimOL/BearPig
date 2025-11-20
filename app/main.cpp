@@ -1,3 +1,4 @@
+#include "libbearpig/printvisitor.h"
 #include <exception>
 #include <libbearpig/lib.h>
 #include <libbearpig/nfa.h>
@@ -38,6 +39,10 @@ int main(int argc, char** argv) {
   RegexParser regex_parser{tokens};
   if (regex_parser.parse()) {
     spdlog::info("successful parse!");
+    AlternativeExp* top = regex_parser.get_top_of_expression();
+    spdlog::info("num alternatives: {}", top->alternatives.size());
+    PrintVisitor p{};
+    top->apply(&p);
   }
   else {
     spdlog::warn("unsuccessful parse");
