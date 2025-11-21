@@ -57,9 +57,7 @@ std::string to_string(RegexTokenType t);
 
 struct RegexToken {
   RegexTokenType tokentype;
-  // int length;
   int column;
-  // char* first;
   std::string_view data;
 };
 

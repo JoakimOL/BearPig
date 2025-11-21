@@ -3,7 +3,6 @@
 #include "libbearpig/regextokens.h"
 #include <algorithm>
 #include <memory>
-#include <span>
 #include <spdlog/spdlog.h>
 
 namespace {
@@ -122,7 +121,6 @@ ConcatExp RegexParser::parse_concatenation_exp() {
 
 QuantifiedExp RegexParser::parse_quantified_exp() {
   QuantifiedExp quantified_exp{};
-  // std::unique_ptr<ElementaryExp> elem = parse_elementary_exp();
   auto e = parse_elementary_exp();
   quantified_exp.exp = std::move(e);
   switch (current_token.tokentype) {
@@ -164,11 +162,6 @@ std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
   }
   case (RegexTokenType::CHARACTER): {
     return std::make_unique<RChar>(parse_character());
-    // RChar ch = parse_character();
-    // for(RegexToken tok: ch.characters){
-    //   spdlog::info("{}", tok.data);
-    // }
-    // return ch;
   }
   case (RegexTokenType::ESCAPE): {
     return std::make_unique<EscapeSeq>(parse_escape_seq());

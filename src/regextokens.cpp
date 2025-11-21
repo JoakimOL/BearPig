@@ -60,12 +60,11 @@ std::string to_string(RegexTokenType t) {
     return "anything";
   }
   default: {
-    return "DEFUALT";
+    return "DEFAULT";
   }
   }
 }
 RegexToken invalid = RegexToken{RegexTokenType::INVALID, 0, ""};
 const RegexToken& invalid_token(){
   return invalid;
-   // return RegexToken{RegexTokenType::INVALID, 0, ""};
  };

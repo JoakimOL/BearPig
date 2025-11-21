@@ -17,10 +17,6 @@ public:
   explicit RegexParser(std::vector<RegexToken> tokens)
       : tokenstream(tokens), current_token_idx{0},
         current_token{tokenstream[current_token_idx]} {
-    // for (auto token : tokenstream) {
-    //   spdlog::info("{}::token: {} ({}) at {}", __func__, token.data,
-    //                to_string(token.tokentype), token.column);
-    // }
   }
 
 private:
