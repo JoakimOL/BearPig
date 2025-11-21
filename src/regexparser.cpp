@@ -21,6 +21,19 @@ void RegexParser::end_of_input_error() {
       current_token_idx);
 }
 
+template <typename... Rs>
+void RegexParser::unexpected_token_error(std::string_view func,
+                                         Rs &&...expected) {
+  std::ostringstream oss;
+  (oss << ... << fmt::format("{} ", to_string(expected)));
+
+  print_error_message_and_exit(
+      fmt::format("Unexpected token at {} in {}: got {}, expected: {}",
+                  current_token_idx, func, to_string(current_token.tokentype),
+                  oss.str()),
+      current_token_idx);
+}
+
 void RegexParser::unexpected_token_error(std::string_view func,
                                          const RegexTokenType &expected) {
   print_error_message_and_exit(
@@ -167,7 +180,9 @@ std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
     return std::make_unique<EscapeSeq>(parse_escape_seq());
   }
   default:
-    unexpected_token_error(__func__, RegexTokenType::ANY);
+    unexpected_token_error(__func__, RegexTokenType::PAREN_OPEN,
+                           RegexTokenType::SQUARE_OPEN,
+                           RegexTokenType::CHARACTER, RegexTokenType::ANY);
     return {};
   }
 }

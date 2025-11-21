@@ -36,6 +36,8 @@ private:
   EscapeSeq parse_escape_seq();
 
   void end_of_input_error();
+  template <typename... Rs>
+  void unexpected_token_error(std::string_view func, Rs &&...expected);
   void unexpected_token_error(std::string_view func,
                               const RegexTokenType &expected);
   void advance();
