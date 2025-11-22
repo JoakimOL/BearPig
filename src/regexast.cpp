@@ -1,5 +1,6 @@
 #include "libbearpig/regexast.h"
 #include "libbearpig/basevisitor.h"
+#include <algorithm>
 
 void AlternativeExp::apply(BaseVisitor *v) {
   v->visit(*this);

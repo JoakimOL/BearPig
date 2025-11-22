@@ -3,8 +3,10 @@
 
 #include <libbearpig/basevisitor.h>
 #include <libbearpig/regextokens.h>
+#include <memory>
 #include <numeric>
 #include <span>
+#include <vector>
 
 class Visitable {
 public:
@@ -96,6 +98,8 @@ struct QuantifiedExp : public Visitable {
     case (QuantifiedExp::Quantifier::OPTIONAL): {
       return "OPTIONAL";
     }
+    default:
+      return "Should never happen";
     }
   }
 
