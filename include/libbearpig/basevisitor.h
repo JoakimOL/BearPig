@@ -1,15 +1,7 @@
 #ifndef BASEVISITOR_H__
 #define BASEVISITOR_H__
 
-class AlternativeExp;
-class ConcatExp;
-class QuantifiedExp;
-class GroupExp;
-class SetExp;
-class SetItem;
-class RChar;
-class AnyExp;
-class EscapeSeq;
+#include <libbearpig/regexast.h>
 
 class BaseVisitor {
 public:
@@ -22,9 +14,6 @@ public:
   virtual void visit(RChar &) = 0;
   virtual void visit(AnyExp &) = 0;
   virtual void visit(EscapeSeq &) = 0;
-  int depth{0};
-  void inc_depth() { depth++; }
-  void dec_depth() { depth--; }
   virtual ~BaseVisitor() = default;
 };
 

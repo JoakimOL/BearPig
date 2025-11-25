@@ -1,12 +1,14 @@
 #ifndef REGEXAST_H__
 #define REGEXAST_H__
 
-#include <libbearpig/basevisitor.h>
 #include <libbearpig/regextokens.h>
 #include <memory>
 #include <numeric>
 #include <span>
 #include <vector>
+
+class BaseVisitor;
+class AlternativeExp;
 
 class Visitable {
 public:
@@ -28,7 +30,7 @@ struct RChar : public ElementaryExp {
   void apply(BaseVisitor *v) override;
   int idx;
   RegexToken character;
-  std::string to_string() { return std::string(character.data); }
+  std::string to_string() { return std::string{character.data}; }
 };
 
 struct EscapeSeq : public RChar {

@@ -4,6 +4,9 @@
 #include <libbearpig/basevisitor.h>
 
 class PrintVisitor : public BaseVisitor {
+private:
+  int depth{0};
+
 public:
   void visit(AlternativeExp &) override;
   void visit(ConcatExp &) override;
