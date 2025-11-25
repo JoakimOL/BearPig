@@ -2,6 +2,7 @@
 #define NFA_H_
 #include <filesystem>
 #include <map>
+#include <set>
 
 struct Transition {
   size_t from; // redundant information?
@@ -17,6 +18,7 @@ struct State {
 
 struct NFA {
 private:
+  std::set<size_t> epsilon_things(size_t current);
   size_t next_id = 0;
 
 public:
@@ -31,6 +33,7 @@ public:
   void to_dot(std::filesystem::path dotfile =
                   std::filesystem::path("./dot/test.dot")) const;
   size_t add_state();
+  bool match(const std::string &input);
 
   void add_transition_to_state(size_t state_id, const Transition &transition) {
     states.at(state_id).transitions.insert({transition.edge, transition});

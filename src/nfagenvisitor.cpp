@@ -42,9 +42,10 @@ void NfaGenVisitor::visit(AlternativeExp &exp) {
   size_t start = nfa.add_state();
   size_t parent_id = id;
   size_t end = nfa.add_state();
-  nfa.add_transition_to_state(parent_id, start, 's');
+  nfa.add_transition_to_state(parent_id, start, 0);
   if (nfa.currentAccept.id == parent_id) {
-    spdlog::debug("accepting state was: {}, current:{}", nfa.currentAccept.id, end);
+    spdlog::debug("accepting state was: {}, current:{}", nfa.currentAccept.id,
+                  end);
     nfa.currentAccept.is_accept = false;
     nfa.currentAccept = nfa.states.at(end);
     nfa.states.at(end).is_accept = true;
@@ -52,10 +53,12 @@ void NfaGenVisitor::visit(AlternativeExp &exp) {
   id = start;
   for (size_t i = 0; i < exp.alternatives.size(); i++) {
     size_t new_state = nfa.add_state();
-    nfa.add_transition_to_state(start, new_state, '1');
+    nfa.add_transition_to_state(start, new_state, 0);
+    // nfa.add_transition_to_state(start, new_state, '1');
     id = new_state;
     exp.alternatives[i].apply(this);
-    nfa.add_transition_to_state(id, end, 'e');
+    nfa.add_transition_to_state(id, end, 0);
+    // nfa.add_transition_to_state(id, end, 'e');
   }
   id = end;
   return;
@@ -66,7 +69,8 @@ void NfaGenVisitor::visit(ConcatExp &exp) {
 
   size_t start = nfa.add_state();
   size_t parent_id = id;
-  nfa.add_transition_to_state(parent_id, start, '2');
+  // nfa.add_transition_to_state(parent_id, start, '2');
+  nfa.add_transition_to_state(parent_id, start, 0);
   id = start;
   for (size_t i = 0; i < exp.exps.size(); i++) {
     exp.exps[i].apply(this);
@@ -154,19 +158,22 @@ void NfaGenVisitor::visit(SetItem &exp) {
     char diff = stopchar - startchar;
     for (char i = 0; i <= diff; i++) {
       size_t new_state = nfa.add_state();
-      nfa.add_transition_to_state(subexpstart, new_state, '1');
+      nfa.add_transition_to_state(subexpstart, new_state, 0);
+      // nfa.add_transition_to_state(subexpstart, new_state, '1');
       id = new_state;
       RChar synth;
       synth.character = RegexToken{RegexTokenType::CHARACTER, exp.start.idx,
                                    static_cast<char>(startchar + i)};
       synth.idx = exp.start.idx;
       synth.apply(this);
-      nfa.add_transition_to_state(id, end, 'e');
+      // nfa.add_transition_to_state(id, end, 'e');
+      nfa.add_transition_to_state(id, end, 0);
     }
   }
   else {
     exp.start.apply(this);
-    nfa.add_transition_to_state(id, end, 'e');
+    // nfa.add_transition_to_state(id, end, 'e');
+    nfa.add_transition_to_state(id, end, 0);
   }
   id = end;
   return;
