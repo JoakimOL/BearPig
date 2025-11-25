@@ -24,9 +24,10 @@ public:
   void visit(AnyExp &) override;
   void visit(EscapeSeq &) override;
 
-  void print_diag_message(const std::string &msg, int loc, spdlog::level::level_enum level = spdlog::level::err);
-  void invalid_range_error(char start, char stop, size_t column);
-  void confusing_range_warning(char start, char stop, size_t column);
+  void print_diag_message(const std::string &msg, size_t start, size_t stop,
+                          spdlog::level::level_enum level = spdlog::level::err);
+  void invalid_range_error(RChar startchar, RChar stopchar);
+  void confusing_range_warning(RChar start, RChar stop);
 };
 
 #endif //NFAGENVISITOR_H_

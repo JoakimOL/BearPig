@@ -4,7 +4,8 @@
 #include <libbearpig/nfagenvisitor.h>
 #include <libbearpig/regexast.h>
 
-void NfaGenVisitor::print_diag_message(const std::string &msg, int loc,
+void NfaGenVisitor::print_diag_message(const std::string &msg, size_t start,
+                                       size_t stop,
                                        spdlog::level::level_enum level) {
   std::stringstream ss;
   // 31 = red for error, 33 = yellow for warning
@@ -13,23 +14,26 @@ void NfaGenVisitor::print_diag_message(const std::string &msg, int loc,
                 [&ss](RegexToken t) { ss << t.data; });
   spdlog::log(level, msg);
   spdlog::log(level, ss.str());
-  spdlog::log(level, "\033[{}m{: >{}}\033[0m", color, "^", loc + 1);
+  std::string padding = fmt::format("{: >{}}", " ", start);
+  std::string diag_line = fmt::format("{:^>{}}", "^", stop - start + 1);
+  spdlog::log(level, "\033[{}m{}{}\033[0m", color, padding, diag_line);
 }
 
-void NfaGenVisitor::invalid_range_error(char start, char stop, size_t column) {
+void NfaGenVisitor::invalid_range_error(RChar startchar, RChar stopchar) {
 
-  print_diag_message(fmt::format("[{}-{}] is an invalid range", start, stop),
-                     column);
+  print_diag_message(fmt::format("[{}-{}] is an invalid range", startchar.character.data, stopchar.character.data),
+                     startchar.character.column, stopchar.character.column);
   exit(1);
 }
 
-void NfaGenVisitor::confusing_range_warning(char start, char stop,
-                                            size_t column) {
+void NfaGenVisitor::confusing_range_warning(RChar startchar, RChar stopchar) {
+  auto columnstart = startchar.character.column;
+  auto columnstop = stopchar.character.column;
   print_diag_message(
       fmt::format("[{}-{}] might not do what you expected. Consider not mixing "
                   "upper case and lower case symbols in the same range",
-                  start, stop),
-      column, spdlog::level::warn);
+                  startchar.character.data, stopchar.character.data),
+      columnstart, columnstop, spdlog::level::warn);
 }
 
 void NfaGenVisitor::visit(AlternativeExp &exp) {
@@ -142,10 +146,10 @@ void NfaGenVisitor::visit(SetItem &exp) {
     char startchar = exp.start.character.data;
     char stopchar = exp.stop.character.data;
     if (startchar > stopchar) {
-      invalid_range_error(startchar, stopchar, exp.start.character.column);
+      invalid_range_error(exp.start, exp.stop);
     }
     else if (stopchar >= 91 && startchar <= 96) {
-      confusing_range_warning(startchar, stopchar, exp.start.character.column);
+      confusing_range_warning(exp.start, exp.stop);
     }
     char diff = stopchar - startchar;
     for (char i = 0; i <= diff; i++) {
