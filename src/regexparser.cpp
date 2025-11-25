@@ -61,8 +61,8 @@ void RegexParser::advance() {
   if (current_token_idx < tokenstream.size()) {
     current_token = tokenstream.at(current_token_idx);
   } else {
-    current_token = RegexToken{RegexTokenType::EOS, current_token_idx, ""};
     spdlog::debug("terminating");
+    current_token = RegexToken{RegexTokenType::EOS, current_token_idx, 0};
   }
 }
 

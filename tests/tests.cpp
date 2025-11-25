@@ -26,7 +26,7 @@ TEST(REGEXPARSER, basic_able_to_parse_characters){
   EXPECT_EQ(quantified_exp.quantifier, QuantifiedExp::Quantifier::NONE);
 
   auto rchar = ((RChar*)quantified_exp.exp.get());
-  EXPECT_EQ(rchar->character.data, "a");
+  EXPECT_EQ(rchar->character.data, 'a');
   EXPECT_EQ(rchar->character.column, 0);
   EXPECT_EQ(rchar->character.tokentype, RegexTokenType::CHARACTER);
   

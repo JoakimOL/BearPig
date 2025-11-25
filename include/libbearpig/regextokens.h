@@ -58,7 +58,7 @@ std::string to_string(RegexTokenType t);
 struct RegexToken {
   RegexTokenType tokentype;
   int column;
-  std::string_view data;
+  char data;
 };
 
 const RegexToken& invalid_token();

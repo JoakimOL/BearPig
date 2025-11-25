@@ -30,73 +30,73 @@ RegexToken RegexScanner::next() {
   switch (current_char) {
   case ('*'): {
     token = RegexToken{RegexTokenType::STAR, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('('): {
     token = RegexToken{RegexTokenType::PAREN_OPEN, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('['): {
     token = RegexToken{RegexTokenType::SQUARE_OPEN, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case (')'): {
     token = RegexToken{RegexTokenType::PAREN_CLOSE, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case (']'): {
     token = RegexToken{RegexTokenType::SQUARE_CLOSE, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('?'): {
     token = RegexToken{RegexTokenType::OPTIONAL, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('.'): {
     token = RegexToken{RegexTokenType::ANY, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('-'): {
     token = RegexToken{RegexTokenType::DASH, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('^'): {
     token = RegexToken{RegexTokenType::CARET, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('|'): {
     token = RegexToken{RegexTokenType::ALTERNATIVE, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('+'): {
     token = RegexToken{RegexTokenType::PLUS, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('\\'): {
     token = RegexToken{RegexTokenType::ESCAPE, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   case ('\n'): // do we need to handle newlines in particular?
   case (' '): {
     token = RegexToken{RegexTokenType::WHITESPACE, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
     break;
   }
   default: {
     token = RegexToken{RegexTokenType::CHARACTER, current_column,
-                       input.substr(current_column, 1)};
+                       input[current_column]};
   }
   }
   current_column++;

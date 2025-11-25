@@ -64,7 +64,7 @@ std::string to_string(RegexTokenType t) {
   }
   }
 }
-RegexToken invalid = RegexToken{RegexTokenType::INVALID, 0, ""};
+RegexToken invalid = RegexToken{RegexTokenType::INVALID, 0, 0};
 const RegexToken& invalid_token(){
   return invalid;
  };
