@@ -6,6 +6,7 @@ set(HEADER_LIST
   "${bearpig_SOURCE_DIR}/include/libbearpig/nfa.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/basevisitor.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/printvisitor.h"
+  "${bearpig_SOURCE_DIR}/include/libbearpig/nfagenvisitor.h"
 )
 
 add_library(libbearpig
@@ -15,6 +16,7 @@ add_library(libbearpig
    regexast.cpp
    nfa.cpp
    printvisitor.cpp
+   nfagenvisitor.cpp
    ${HEADER_LIST}
  )
 

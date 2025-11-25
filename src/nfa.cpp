@@ -1,4 +1,5 @@
 #include <fstream>
+#include <fmt/format.h>
 #include <libbearpig/nfa.h>
 
 void NFA::to_dot(std::filesystem::path dotfile) const {
@@ -7,12 +8,21 @@ void NFA::to_dot(std::filesystem::path dotfile) const {
 
   outstream << "digraph{";
   outstream << "rankdir=LR;";
+  outstream << "node[shape=circle];";
 
   for (auto key_val : states) {
     for (auto edge_transition_tuple : key_val.second.transitions) {
       Transition transition = edge_transition_tuple.second;
-      outstream << fmt::format("{}->{}[label={}];", transition.from,
-                               transition.to, transition.edge);
+      bool accept = currentAccept.id == transition.to;
+      if (accept) {
+        outstream << fmt::format("{}[shape=doublecircle]", transition.to);
+      }
+      outstream << fmt::format(
+          "{}->{}[label={}];", transition.from, transition.to,
+          transition.edge == 0
+              ? "\"\""
+              : fmt::format("\"{}{}\"", transition.edge == '\\' ? "\\" : "",
+                            std::string{transition.edge}));
     }
   }
   outstream << "}";
@@ -20,8 +30,7 @@ void NFA::to_dot(std::filesystem::path dotfile) const {
 }
 
 size_t NFA::add_state() {
-  State state;
-  state.id = next_id++;
+  State state{{}, ++next_id, false};
   states.insert({state.id, state});
   return state.id;
 }

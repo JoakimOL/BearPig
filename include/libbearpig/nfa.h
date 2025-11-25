@@ -2,7 +2,6 @@
 #define NFA_H_
 #include <filesystem>
 #include <map>
-#include <spdlog/spdlog.h>
 
 struct Transition {
   size_t from; // redundant information?
@@ -21,8 +20,13 @@ private:
   size_t next_id = 0;
 
 public:
+  NFA() {
+    State init{{}, 0, true};
+    states.insert({0, init});
+    currentAccept = init;
+  }
   std::map<size_t, State> states;
-  State currentState;
+  State currentAccept;
   void fill_with_dummy_data();
   void to_dot(std::filesystem::path dotfile =
                   std::filesystem::path("./dot/test.dot")) const;
