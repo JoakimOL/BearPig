@@ -2,6 +2,7 @@
 #define NFA_H_
 #include <filesystem>
 #include <map>
+#include <set>
 
 struct Transition {
   size_t from; // redundant information?
@@ -15,9 +16,18 @@ struct State {
   bool is_accept;
 };
 
+struct RegexMatch{
+  bool success;
+  size_t start;
+  size_t length;
+  std::string match;
+};
+
 struct NFA {
 private:
+  std::set<size_t> get_all_available_epsilon_transitions(size_t current);
   size_t next_id = 0;
+  RegexMatch run_nfa(std::string_view input, bool exact, size_t start_id = 0);
 
 public:
   NFA() {
@@ -25,12 +35,15 @@ public:
     states.insert({0, init});
     currentAccept = init;
   }
-  std::map<size_t, State> states;
   State currentAccept;
+  std::map<size_t, State> states;
+
   void fill_with_dummy_data();
   void to_dot(std::filesystem::path dotfile =
                   std::filesystem::path("./dot/test.dot")) const;
   size_t add_state();
+  RegexMatch match(std::string_view input);
+  RegexMatch find_first(std::string_view input);
 
   void add_transition_to_state(size_t state_id, const Transition &transition) {
     states.at(state_id).transitions.insert({transition.edge, transition});

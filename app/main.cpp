@@ -12,9 +12,11 @@
 int main(int argc, char** argv) {
   // std::string input("((a|abab)*b+)?");
   // std::string input("(a)");
-  std::string input(R"([abc\[]\[)");
+  std::string input(R"(abc)");
+  std::string query(R"([abc\[]\[)");
   argparse::ArgumentParser program(argv[0]);
-  program.add_argument("input").help("input regex to use").remaining();
+  program.add_argument("query").help("regex to use as a query");
+  program.add_argument("input").help("input string to search");
   program.add_argument("-v").flag().help("enable verbose logging");
 
   try {
@@ -28,11 +30,15 @@ int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug);
   }
 
+  if(program.is_used("query")){
+    query = program.get<std::string>("query");
+  }
+
   if(program.is_used("input")){
     input = program.get<std::string>("input");
   }
   
-  RegexScanner scanner{input};
+  RegexScanner scanner{query};
   auto tokens = scanner.tokenize();
   // for (auto token : tokens) {
   //   spdlog::info("token: {} ({}) at {}", token.data,
@@ -57,6 +63,16 @@ int main(int argc, char** argv) {
   AlternativeExp *top = regex_parser.get_top_of_expression();
   top->apply(&nfagen);
   nfa.to_dot();
+
+
+  spdlog::info("found exact match: {}", nfa.match(input).success);
+  auto substringmatch = nfa.find_first(input);
+  spdlog::info("found sub string match: {}", substringmatch.success);
+  spdlog::info("first matched string: {}", substringmatch.match);
+  spdlog::info(input);
+  std::string padding = fmt::format("{:>{}}", "", substringmatch.start);
+  std::string diag_line = fmt::format("{:^>{}}", "^", substringmatch.length);
+  spdlog::info("\033[33m{}{}\033[0m", padding, diag_line);
 
   return 0;
 }
