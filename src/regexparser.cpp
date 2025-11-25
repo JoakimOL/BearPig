@@ -55,14 +55,14 @@ void RegexParser::print_error_message_and_exit(const std::string &msg,
 }
 
 void RegexParser::advance() {
-  spdlog::info("{}::current_token: {} idx: {}", __func__,
+  spdlog::debug("{}::current_token: {} idx: {}", __func__,
                to_string(current_token.tokentype), current_token_idx);
   current_token_idx++;
   if (current_token_idx < tokenstream.size()) {
     current_token = tokenstream.at(current_token_idx);
   } else {
-    spdlog::info("is this being run?");
     current_token = RegexToken{RegexTokenType::EOS, current_token_idx, ""};
+    spdlog::debug("terminating");
   }
 }
 
@@ -82,7 +82,7 @@ void RegexParser::consume(std::string_view func, RegexTokenType expected) {
 #define consume_wf(expected) (consume((__func__), (expected)))
 
 bool RegexParser::parse() {
-  spdlog::info("{}::current_token: {} idx: {}", __func__,
+  spdlog::debug("{}::current_token: {} idx: {}", __func__,
                to_string(current_token.tokentype), current_token_idx);
   return parse_top_level();
 }
@@ -161,7 +161,7 @@ QuantifiedExp RegexParser::parse_quantified_exp() {
 }
 
 std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
-  spdlog::info("{}::current_token: {} ({}) at {}", __func__, current_token.data,
+  spdlog::debug("{}::current_token: {} ({}) at {}", __func__, current_token.data,
                to_string(current_token.tokentype), current_token.column);
   switch (current_token.tokentype) {
   case (RegexTokenType::PAREN_OPEN): {
@@ -188,7 +188,7 @@ std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
 }
 
 RChar RegexParser::parse_character(bool single) {
-  spdlog::info("{}::expecting {}, current_token: {}", __func__,
+  spdlog::debug("{}::expecting {}, current_token: {}", __func__,
                to_string(RegexTokenType::CHARACTER),
                to_string(current_token.tokentype));
   RChar character;
@@ -200,7 +200,7 @@ RChar RegexParser::parse_character(bool single) {
 }
 
 EscapeSeq RegexParser::parse_escape_seq() {
-  spdlog::info("{}::current {} next: {}", __func__,
+  spdlog::debug("{}::current {} next: {}", __func__,
                to_string(current_token.tokentype),
                to_string(tokenstream.at(current_token_idx + 1).tokentype));
   EscapeSeq esc;
@@ -209,7 +209,7 @@ EscapeSeq RegexParser::parse_escape_seq() {
   auto escaped_token = current_token;
   esc.character = escaped_token;
   consume_wf(RegexTokenType::ACCEPT_ANY);
-  spdlog::info("{}::escaped token: '{}' ({})", __func__, escaped_token.data, to_string(escaped_token.tokentype));
+  spdlog::debug("{}::escaped token: '{}' ({})", __func__, escaped_token.data, to_string(escaped_token.tokentype));
   return esc;
 }
 
@@ -229,7 +229,7 @@ GroupExp RegexParser::parse_group() {
 }
 
 SetExp RegexParser::parse_set() {
-  spdlog::info("{}::attempting to parse set", __func__);
+  spdlog::debug("{}::attempting to parse set", __func__);
   consume_wf(RegexTokenType::SQUARE_OPEN);
   SetExp e;
 
@@ -240,7 +240,7 @@ SetExp RegexParser::parse_set() {
   e.items = std::move(parse_set_items());
 
   consume_wf(RegexTokenType::SQUARE_CLOSE);
-  spdlog::info("{}::successfully parsed a {}set", __func__,
+  spdlog::debug("{}::successfully parsed a {}set", __func__,
                e.negative ? "negative " : "");
   return e;
 }
@@ -254,7 +254,7 @@ std::vector<SetItem> RegexParser::parse_set_items() {
 }
 
 SetItem RegexParser::parse_set_item() {
-  spdlog::info("{}::attempting to a parse set item!", __func__);
+  spdlog::debug("{}::attempting to a parse set item!", __func__);
   SetItem item;
 
   item.start = std::move(parse_character());
@@ -263,7 +263,7 @@ SetItem RegexParser::parse_set_item() {
     item.range = true;
     item.stop = parse_character(true);
   }
-  spdlog::info("{}::parsed a {}set item! start:{}{}", __func__,
+  spdlog::debug("{}::parsed a {}set item! start:{}{}", __func__,
                item.range ? "range " : "", item.start.to_string(),
                item.range ? fmt::format("-{}", item.stop.to_string()) : "");
   return item;
