@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <map>
 #include <set>
+#include <vector>
 
 struct Transition {
   size_t from; // redundant information?
@@ -46,6 +47,7 @@ struct RegexMatch {
 struct NFA {
 private:
   std::set<size_t> get_all_available_epsilon_transitions(size_t current);
+  std::set<char> get_possible_first_characters();
   size_t next_id = 0;
   RegexMatch run_nfa(std::string_view input, bool exact, size_t start_id = 0);
 
@@ -72,6 +74,9 @@ public:
     Transition transition{state_id, to, edge};
     states.at(state_id).transitions.insert({edge, transition});
   }
+  RegexMatch exact_match(std::string_view input);
+  RegexMatch find_first_match(std::string_view input);
+  std::vector<RegexMatch> find_all_matches(std::string_view input);
 };
 
 #endif // NFA_H_

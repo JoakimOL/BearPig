@@ -67,14 +67,21 @@ int main(int argc, char **argv) {
   top->apply(&nfagen);
   nfa.to_dot();
 
-  spdlog::info("found exact match: {}", nfa.match(input).success);
-  auto substringmatch = nfa.find_first(input);
+  spdlog::info("found exact match: {}", nfa.exact_match(input).success);
+  auto substringmatch = nfa.find_first_match(input);
   spdlog::info("found sub string match: {}", substringmatch.success);
   spdlog::info("first matched string: {}", substringmatch.match);
   spdlog::info(input);
   std::string padding = fmt::format("{:>{}}", "", substringmatch.start);
   std::string diag_line = fmt::format("{:^>{}}", "^", substringmatch.length);
   spdlog::info("\033[33m{}{}\033[0m", padding, diag_line);
+
+  spdlog::info("trying to find all matches.");
+  auto matches = nfa.find_all_matches(input);
+  spdlog::info("found {} matches", matches.size());
+  for(auto match : matches){
+    spdlog::info(" {}", match.match);
+  }
 
   return 0;
 }

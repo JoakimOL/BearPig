@@ -3,6 +3,7 @@
 #include <fstream>
 #include <libbearpig/nfa.h>
 #include <stack>
+#include <vector>
 
 void NFA::to_dot(std::filesystem::path dotfile) const {
 
@@ -74,7 +75,7 @@ std::set<size_t> NFA::get_all_available_epsilon_transitions(size_t current) {
   return epsilon_states;
 }
 
-RegexMatch NFA::find_first(std::string_view input) {
+std::set<char> NFA::get_possible_first_characters() {
   std::set<char> starts{};
   auto init = get_all_available_epsilon_transitions(0);
   for (size_t id : init) {
@@ -85,6 +86,26 @@ RegexMatch NFA::find_first(std::string_view input) {
       }
     }
   }
+  return starts;
+}
+
+std::vector<RegexMatch> NFA::find_all_matches(std::string_view input) {
+  std::set<char> starts = get_possible_first_characters();
+  std::vector<RegexMatch> matches{};
+  size_t i = 0;
+  while (i <= input.size()) {
+    for (; i < input.size() && !starts.contains(input[i]); i++)
+      ;
+    auto match = run_nfa(input.substr(i), false, i);
+    if (match.success)
+      matches.emplace_back(match);
+    i++;
+  }
+  return matches;
+}
+
+RegexMatch NFA::find_first_match(std::string_view input) {
+  std::set<char> starts = get_possible_first_characters();
   RegexMatch match{.success = false};
   size_t i = 0;
   while (i <= input.size() && !match.success) {
@@ -96,7 +117,9 @@ RegexMatch NFA::find_first(std::string_view input) {
   return match;
 }
 
-RegexMatch NFA::match(std::string_view input) { return run_nfa(input, true); }
+RegexMatch NFA::exact_match(std::string_view input) {
+  return run_nfa(input, true);
+}
 
 RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
   RegexMatch result{.success = false, .start = start_id};
