@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <map>
 #include <set>
+#include "fmt/core.h"
+#include "fmt/ranges.h"
 
 struct Transition {
   size_t from; // redundant information?
@@ -10,10 +12,28 @@ struct Transition {
   char edge;
 };
 
+template <> struct fmt::formatter<Transition> {
+    constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+    template <typename FormatContext>
+    auto format(const Transition & trans, FormatContext& ctx) const {
+      return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
+                            trans.edge == 0 ? ""
+                                         : fmt::format("over {}", trans.edge));
+    }
+};
+
 struct State {
   std::multimap<char, Transition> transitions;
   size_t id;
   bool is_accept;
+};
+
+template <> struct fmt::formatter<State> {
+    constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+    template <typename FormatContext>
+    auto format(const State & state, FormatContext& ctx) const {
+      return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
+    }
 };
 
 struct RegexMatch{
