@@ -8,19 +8,8 @@ project(
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
-# only do if main project not if included through add_subdirectory
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-
-  # ensure -std=c++xx instead of -std=g++xx
-  set(cmake_cxx_extensions off)
-
-  include(CTest)
-
-endif()
-
 include(FetchContent)
 
-# fetch argparse
 fetchcontent_declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
@@ -47,10 +36,19 @@ fetchcontent_makeavailable(spdlog)
 # library code is here
 add_subdirectory(src)
 
-# application code is here
-add_subdirectory(app)
+# only do if main project not if included through add_subdirectory
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND BUILD_TESTING)
-  add_subdirectory(tests)
+  # ensure -std=c++xx instead of -std=g++xx
+  set(cmake_cxx_extensions off)
+
+  include(CTest)
+
+  # application code is here
+  add_subdirectory(app)
+  if(BUILD_TESTING)
+    # and finally, test code 
+    add_subdirectory(tests)
+  endif()
 endif()
 
