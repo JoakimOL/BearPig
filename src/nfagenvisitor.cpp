@@ -21,7 +21,9 @@ void NfaGenVisitor::print_diag_message(const std::string &msg, size_t start,
 
 void NfaGenVisitor::invalid_range_error(RChar startchar, RChar stopchar) {
 
-  print_diag_message(fmt::format("[{}-{}] is an invalid range", startchar.character.data, stopchar.character.data),
+  print_diag_message(fmt::format("[{}-{}] is an invalid range",
+                                 startchar.character.data,
+                                 stopchar.character.data),
                      startchar.character.column, stopchar.character.column);
   exit(1);
 }
@@ -151,8 +153,7 @@ void NfaGenVisitor::visit(SetItem &exp) {
     char stopchar = exp.stop.character.data;
     if (startchar > stopchar) {
       invalid_range_error(exp.start, exp.stop);
-    }
-    else if (stopchar >= 91 && startchar <= 96) {
+    } else if (stopchar >= 91 && startchar <= 96) {
       confusing_range_warning(exp.start, exp.stop);
     }
     char diff = stopchar - startchar;
@@ -169,8 +170,7 @@ void NfaGenVisitor::visit(SetItem &exp) {
       // nfa.add_transition_to_state(id, end, 'e');
       nfa.add_transition_to_state(id, end, 0);
     }
-  }
-  else {
+  } else {
     exp.start.apply(this);
     // nfa.add_transition_to_state(id, end, 'e');
     nfa.add_transition_to_state(id, end, 0);

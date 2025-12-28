@@ -45,7 +45,8 @@ void PrintVisitor::visit(SetExp &exp) {
   spdlog::info("{} {} {} (depth: {})", indentation, "SetExp",
                exp.negative ? "(Negative)" : "", depth);
   depth++;
-  for_each(exp.items.begin(), exp.items.end(), [this](SetItem i) { i.apply(this); });
+  for_each(exp.items.begin(), exp.items.end(),
+           [this](SetItem i) { i.apply(this); });
   depth--;
   return;
 }
@@ -70,6 +71,7 @@ void PrintVisitor::visit(AnyExp &exp) {
 }
 void PrintVisitor::visit(EscapeSeq &exp) {
   std::string indentation = fmt::format("{: >{}}", "", depth);
-  spdlog::info("{}{}: {} (depth: {})", indentation, "Escape", exp.character.data, depth);
+  spdlog::info("{}{}: {} (depth: {})", indentation, "Escape",
+               exp.character.data, depth);
   return;
 }

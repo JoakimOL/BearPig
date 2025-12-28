@@ -1,8 +1,8 @@
 #ifndef REGEXPARSER_H_
 #define REGEXPARSER_H_
 
-#include <libbearpig/regextokens.h>
 #include <libbearpig/regexast.h>
+#include <libbearpig/regextokens.h>
 #include <memory>
 #include <vector>
 
@@ -12,12 +12,11 @@ public:
   bool is_done() { return current_token_idx == tokenstream.size(); };
   int get_current_token_idx() const { return current_token_idx; }
   int get_size_of_tokenstream() const { return tokenstream.size(); }
-  AlternativeExp* get_top_of_expression() const { return expression_top.get(); }
+  AlternativeExp *get_top_of_expression() const { return expression_top.get(); }
   RegexParser() = delete;
   explicit RegexParser(std::vector<RegexToken> tokens)
       : tokenstream(tokens), current_token_idx{0},
-        current_token{tokenstream[current_token_idx]} {
-  }
+        current_token{tokenstream[current_token_idx]} {}
 
 private:
   bool parse_top_level();

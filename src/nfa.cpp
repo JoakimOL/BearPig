@@ -1,6 +1,6 @@
 #include "spdlog/spdlog.h"
-#include <fstream>
 #include <fmt/format.h>
+#include <fstream>
 #include <libbearpig/nfa.h>
 #include <stack>
 
@@ -52,52 +52,51 @@ void NFA::fill_with_dummy_data() {
   add_transition_to_state(state_id, state_id + 1, 't');
 }
 
-std::set<size_t> NFA::get_all_available_epsilon_transitions(size_t current){
-    std::set<size_t> epsilon_states;
-    std::stack<size_t> stack;
-    stack.push(current);
-    while (!stack.empty()) {
-      size_t current = stack.top();
-      stack.pop();
+std::set<size_t> NFA::get_all_available_epsilon_transitions(size_t current) {
+  std::set<size_t> epsilon_states;
+  std::stack<size_t> stack;
+  stack.push(current);
+  while (!stack.empty()) {
+    size_t current = stack.top();
+    stack.pop();
 
-      if (epsilon_states.find(current) != epsilon_states.end()) {
-        continue;
-      }
-      epsilon_states.insert(current);
-      const auto &current_state = states.at(current);
-      for (const auto &transition : current_state.transitions) {
-        if (transition.first == 0) {
-          stack.push(transition.second.to);
-        }
+    if (epsilon_states.find(current) != epsilon_states.end()) {
+      continue;
+    }
+    epsilon_states.insert(current);
+    const auto &current_state = states.at(current);
+    for (const auto &transition : current_state.transitions) {
+      if (transition.first == 0) {
+        stack.push(transition.second.to);
       }
     }
-    return epsilon_states;
+  }
+  return epsilon_states;
 }
 
 RegexMatch NFA::find_first(std::string_view input) {
   std::set<char> starts{};
   auto init = get_all_available_epsilon_transitions(0);
-  for(size_t id : init){
-     auto state = states.at(id);
-     for(auto transition : state.transitions){
-       if (transition.first != 0) {
-         starts.insert(transition.first);
-       }
-     }
+  for (size_t id : init) {
+    auto state = states.at(id);
+    for (auto transition : state.transitions) {
+      if (transition.first != 0) {
+        starts.insert(transition.first);
+      }
+    }
   }
   RegexMatch match{.success = false};
   size_t i = 0;
   while (i <= input.size() && !match.success) {
-    for (; i < input.size() && !starts.contains(input[i]); i++);
+    for (; i < input.size() && !starts.contains(input[i]); i++)
+      ;
     match = run_nfa(input.substr(i), false, i);
     i++;
   }
   return match;
 }
 
-RegexMatch NFA::match(std::string_view input) {
-  return run_nfa(input, true);
-}
+RegexMatch NFA::match(std::string_view input) { return run_nfa(input, true); }
 
 RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
   RegexMatch result{.success = false, .start = start_id};
@@ -108,7 +107,6 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
   char current_char = input[current_input];
   bool should_greed{false};
 
-  // while (current_input < input.size()) {
   while (true) {
 
     std::set<size_t> next_states;
@@ -122,7 +120,7 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
           (current_input == input.size() || !exact)) {
         result.length = current_input;
         result.success = true;
-        result.match= std::string{input.substr(0, current_input)};
+        result.match = std::string{input.substr(0, current_input)};
         if (!should_greed) {
           return result;
         }
@@ -136,25 +134,24 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
           current_char, state);
       for (auto transition : current_state.transitions) {
         spdlog::debug("from: {} to: {} edge: {}", transition.second.from,
-                     transition.second.to, transition.second.edge);
+                      transition.second.to, transition.second.edge);
       }
       if (current_input < input.size() &&
           current_state.transitions.contains(current_char)) {
         spdlog::debug("state {} has a transition matching the character {}!",
-                     state, current_char);
+                      state, current_char);
         next_states.insert(
             current_state.transitions.find(current_char)->second.to);
         should_greed = true;
       }
     }
-    for(auto state : next_states){
+    for (auto state : next_states) {
       epsilon_states.merge(get_all_available_epsilon_transitions(state));
     }
     next_states.merge(epsilon_states);
     current_input++;
 
     if (next_states.size() == 0) {
-      // spdlog::error("no next states, fuck off");
       return result;
     }
     current_states = next_states;

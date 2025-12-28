@@ -1,10 +1,10 @@
 #ifndef NFA_H_
 #define NFA_H_
+#include "fmt/core.h"
+#include "fmt/ranges.h"
 #include <filesystem>
 #include <map>
 #include <set>
-#include "fmt/core.h"
-#include "fmt/ranges.h"
 
 struct Transition {
   size_t from; // redundant information?
@@ -13,13 +13,13 @@ struct Transition {
 };
 
 template <> struct fmt::formatter<Transition> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-    template <typename FormatContext>
-    auto format(const Transition & trans, FormatContext& ctx) const {
-      return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
-                            trans.edge == 0 ? ""
-                                         : fmt::format("over {}", trans.edge));
-    }
+  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+  template <typename FormatContext>
+  auto format(const Transition &trans, FormatContext &ctx) const {
+    return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
+                          trans.edge == 0 ? ""
+                                          : fmt::format("over {}", trans.edge));
+  }
 };
 
 struct State {
@@ -29,14 +29,14 @@ struct State {
 };
 
 template <> struct fmt::formatter<State> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-    template <typename FormatContext>
-    auto format(const State & state, FormatContext& ctx) const {
-      return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
-    }
+  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+  template <typename FormatContext>
+  auto format(const State &state, FormatContext &ctx) const {
+    return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
+  }
 };
 
-struct RegexMatch{
+struct RegexMatch {
   bool success;
   size_t start;
   size_t length;

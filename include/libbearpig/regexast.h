@@ -3,8 +3,6 @@
 
 #include <libbearpig/regextokens.h>
 #include <memory>
-#include <numeric>
-#include <span>
 #include <vector>
 
 class BaseVisitor;
@@ -69,7 +67,8 @@ struct GroupExp : public ElementaryExp {
 };
 
 struct QuantifiedExp : public Visitable {
-  QuantifiedExp(QuantifiedExp &&other) : exp(std::move(other.exp)), quantifier(other.quantifier) {}
+  QuantifiedExp(QuantifiedExp &&other)
+      : exp(std::move(other.exp)), quantifier(other.quantifier) {}
   explicit QuantifiedExp(const QuantifiedExp &other) = delete;
   explicit QuantifiedExp() = default;
   QuantifiedExp &operator=(const QuantifiedExp &other) = delete;

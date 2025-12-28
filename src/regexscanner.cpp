@@ -18,7 +18,7 @@ std::vector<RegexToken> RegexScanner::tokenize() {
   }
   for (auto token : tokens) {
     spdlog::debug("token: {} ({}) at {}", token.data,
-                 to_string(token.tokentype), token.column);
+                  to_string(token.tokentype), token.column);
   }
   return tokens;
 }
@@ -29,8 +29,8 @@ RegexToken RegexScanner::next() {
   spdlog::debug("current_char={}, column = {}", current_char, current_column);
   switch (current_char) {
   case ('*'): {
-    token = RegexToken{RegexTokenType::STAR, current_column,
-                       input[current_column]};
+    token =
+        RegexToken{RegexTokenType::STAR, current_column, input[current_column]};
     break;
   }
   case ('('): {
@@ -59,13 +59,13 @@ RegexToken RegexScanner::next() {
     break;
   }
   case ('.'): {
-    token = RegexToken{RegexTokenType::ANY, current_column,
-                       input[current_column]};
+    token =
+        RegexToken{RegexTokenType::ANY, current_column, input[current_column]};
     break;
   }
   case ('-'): {
-    token = RegexToken{RegexTokenType::DASH, current_column,
-                       input[current_column]};
+    token =
+        RegexToken{RegexTokenType::DASH, current_column, input[current_column]};
     break;
   }
   case ('^'): {
@@ -79,8 +79,8 @@ RegexToken RegexScanner::next() {
     break;
   }
   case ('+'): {
-    token = RegexToken{RegexTokenType::PLUS, current_column,
-                       input[current_column]};
+    token =
+        RegexToken{RegexTokenType::PLUS, current_column, input[current_column]};
     break;
   }
   case ('\\'): {

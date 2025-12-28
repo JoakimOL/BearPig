@@ -8,12 +8,14 @@
 
 class NfaGenVisitor : public BaseVisitor {
 private:
-  NFA& nfa;
+  NFA &nfa;
   std::vector<RegexToken> tokenstream;
   size_t id{0};
   char last_char;
+
 public:
-  NfaGenVisitor(NFA& nfa, std::vector<RegexToken> tokens) : nfa{nfa}, tokenstream{tokens} {};
+  NfaGenVisitor(NFA &nfa, std::vector<RegexToken> tokens)
+      : nfa{nfa}, tokenstream{tokens} {};
   void visit(AlternativeExp &) override;
   void visit(ConcatExp &) override;
   void visit(QuantifiedExp &) override;
@@ -30,4 +32,4 @@ public:
   void confusing_range_warning(RChar start, RChar stop);
 };
 
-#endif //NFAGENVISITOR_H_
+#endif // NFAGENVISITOR_H_

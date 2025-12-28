@@ -2,7 +2,6 @@
 #define REGEXTOKENS_H_
 
 #include <array>
-#include <string_view>
 #include <string>
 
 enum class RegexTokenType {
@@ -15,14 +14,14 @@ enum class RegexTokenType {
   SQUARE_CLOSE,
 
   // Quantifiers
-  STAR, // a*
-  PLUS, // a+
+  STAR,     // a*
+  PLUS,     // a+
   OPTIONAL, // a?
 
   // Choice
   ALTERNATIVE, // a | b
-  DASH, // [a-b] set ranges
-  CARET, // [^a-b] for negative sets
+  DASH,        // [a-b] set ranges
+  CARET,       // [^a-b] for negative sets
 
   // Characters
   ANY,
@@ -38,19 +37,13 @@ enum class RegexTokenType {
 };
 
 static std::array metacharacters = {
-  RegexTokenType::PLUS,
-  RegexTokenType::PAREN_OPEN,
-  RegexTokenType::PAREN_CLOSE,
-  RegexTokenType::CURLY_OPEN,
-  RegexTokenType::CURLY_CLOSE,
-  RegexTokenType::SQUARE_OPEN,
-  RegexTokenType::SQUARE_CLOSE,
-  RegexTokenType::STAR,
-  RegexTokenType::PLUS,
-  RegexTokenType::OPTIONAL,
-  RegexTokenType::ALTERNATIVE,
-  RegexTokenType::ANY,
-  RegexTokenType::ESCAPE,
+    RegexTokenType::PLUS,         RegexTokenType::PAREN_OPEN,
+    RegexTokenType::PAREN_CLOSE,  RegexTokenType::CURLY_OPEN,
+    RegexTokenType::CURLY_CLOSE,  RegexTokenType::SQUARE_OPEN,
+    RegexTokenType::SQUARE_CLOSE, RegexTokenType::STAR,
+    RegexTokenType::PLUS,         RegexTokenType::OPTIONAL,
+    RegexTokenType::ALTERNATIVE,  RegexTokenType::ANY,
+    RegexTokenType::ESCAPE,
 };
 
 std::string to_string(RegexTokenType t);
@@ -61,6 +54,6 @@ struct RegexToken {
   char data;
 };
 
-const RegexToken& invalid_token();
+const RegexToken &invalid_token();
 
 #endif // REGEXTOKENS_H_
