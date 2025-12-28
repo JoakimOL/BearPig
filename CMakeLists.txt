@@ -31,10 +31,18 @@ fetchcontent_makeavailable(argparse)
 fetchcontent_declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 9cf9f38
+    GIT_TAG 11.2.0
 )
 
 fetchcontent_makeavailable(fmt)
+
+fetchcontent_declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.15.3
+)
+
+fetchcontent_makeavailable(spdlog)
 
 # library code is here
 add_subdirectory(src)

@@ -22,14 +22,6 @@ add_library(libbearpig
 
 target_include_directories(libbearpig PUBLIC ../include)
 
-fetchcontent_declare(
-    spdlog
-    GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG 8e56133
-)
-
-fetchcontent_makeavailable(spdlog)
-
 target_link_libraries(libbearpig PRIVATE
   spdlog::spdlog
   fmt
