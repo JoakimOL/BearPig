@@ -7,13 +7,15 @@
 
 namespace {
 
-void print_expected(std::string_view func, RegexTokenType expected,
-                    RegexTokenType actual) {
+void print_expected(std::string_view func, bp::RegexTokenType expected,
+                    bp::RegexTokenType actual) {
   spdlog::debug("{}::expecting {}, current_token: {}", func,
                 to_string(expected), to_string(actual));
 }
 
 } // namespace
+
+namespace bp {
 
 void RegexParser::end_of_input_error() {
   print_error_message_and_exit(
@@ -274,3 +276,4 @@ SetItem RegexParser::parse_set_item() {
                 item.range ? fmt::format("-{}", item.stop.to_string()) : "");
   return item;
 }
+} // namespace bp

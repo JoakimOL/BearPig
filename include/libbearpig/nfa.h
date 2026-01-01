@@ -7,34 +7,18 @@
 #include <set>
 #include <vector>
 
+namespace bp {
+
 struct Transition {
   size_t from; // redundant information?
   size_t to;
   char edge;
 };
 
-template <> struct fmt::formatter<Transition> {
-  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-  template <typename FormatContext>
-  auto format(const Transition &trans, FormatContext &ctx) const {
-    return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
-                          trans.edge == 0 ? ""
-                                          : fmt::format("over {}", trans.edge));
-  }
-};
-
 struct State {
   std::multimap<char, Transition> transitions;
   size_t id;
   bool is_accept;
-};
-
-template <> struct fmt::formatter<State> {
-  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-  template <typename FormatContext>
-  auto format(const State &state, FormatContext &ctx) const {
-    return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
-  }
 };
 
 struct RegexMatch {
@@ -76,5 +60,26 @@ public:
   RegexMatch find_first_match(std::string_view input);
   std::vector<RegexMatch> find_all_matches(std::string_view input);
 };
+
+} // namespace bp
+
+template <> struct fmt::formatter<bp::Transition> {
+  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+  template <typename FormatContext>
+  auto format(const bp::Transition &trans, FormatContext &ctx) const {
+    return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
+                          trans.edge == 0 ? ""
+                                          : fmt::format("over {}", trans.edge));
+  }
+};
+
+template <> struct fmt::formatter<bp::State> {
+  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
+  template <typename FormatContext>
+  auto format(const bp::State &state, FormatContext &ctx) const {
+    return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
+  }
+};
+
 
 #endif // NFA_H_

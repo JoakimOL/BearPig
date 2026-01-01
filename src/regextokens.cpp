@@ -1,5 +1,6 @@
 #include <libbearpig/regextokens.h>
 
+namespace bp {
 std::string to_string(RegexTokenType t) {
   switch (t) {
   case (RegexTokenType::PAREN_OPEN): {
@@ -66,3 +67,4 @@ std::string to_string(RegexTokenType t) {
 }
 RegexToken invalid = RegexToken{RegexTokenType::INVALID, 0, 0};
 const RegexToken &invalid_token() { return invalid; };
+} // namespace bp

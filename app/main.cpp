@@ -38,18 +38,18 @@ int main(int argc, char **argv) {
     input = program.get<std::string>("input");
   }
 
-  RegexScanner scanner{query};
+  bp::RegexScanner scanner{query};
   auto tokens = scanner.tokenize();
   // for (auto token : tokens) {
   //   spdlog::info("token: {} ({}) at {}", token.data,
   //                to_string(token.tokentype), token.column);
   // }
-  RegexParser regex_parser{tokens};
+  bp::RegexParser regex_parser{tokens};
   if (regex_parser.parse()) {
     spdlog::debug("successful parse!");
-    AlternativeExp *top = regex_parser.get_top_of_expression();
+    bp::AlternativeExp *top = regex_parser.get_top_of_expression();
     if (program.is_used("-v")) {
-      PrintVisitor p{};
+      bp::PrintVisitor p{};
       top->apply(&p);
     }
   } else {
@@ -61,9 +61,9 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  NFA nfa;
-  NfaGenVisitor nfagen{nfa, tokens};
-  AlternativeExp *top = regex_parser.get_top_of_expression();
+  bp::NFA nfa;
+  bp::NfaGenVisitor nfagen{nfa, tokens};
+  bp::AlternativeExp *top = regex_parser.get_top_of_expression();
   top->apply(&nfagen);
   nfa.to_dot();
 

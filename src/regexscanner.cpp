@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+namespace bp {
+
 RegexScanner::RegexScanner(const std::string_view input)
     : input{input}, current_column{0} {
   spdlog::debug("{}::initialized with input={}", __func__, input);
@@ -102,3 +104,5 @@ RegexToken RegexScanner::next() {
   current_column++;
   return token;
 }
+
+} // namespace bp

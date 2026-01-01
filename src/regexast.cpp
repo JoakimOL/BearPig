@@ -1,6 +1,7 @@
 #include "libbearpig/regexast.h"
 #include "libbearpig/basevisitor.h"
 
+namespace bp {
 void AlternativeExp::apply(BaseVisitor *v) { v->visit(*this); }
 void ConcatExp::apply(BaseVisitor *v) { v->visit(*this); }
 
@@ -17,3 +18,4 @@ void RChar::apply(BaseVisitor *v) { v->visit(*this); }
 void AnyExp::apply(BaseVisitor *v) { v->visit(*this); }
 
 void EscapeSeq::apply(BaseVisitor *v) { v->visit(*this); }
+} // namespace bp

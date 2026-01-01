@@ -3,6 +3,8 @@
 
 #include <libbearpig/basevisitor.h>
 
+namespace bp {
+
 class PrintVisitor : public BaseVisitor {
 private:
   int depth{0};
@@ -18,5 +20,7 @@ public:
   void visit(AnyExp &) override;
   void visit(EscapeSeq &) override;
 };
+
+} // namespace bp
 
 #endif // PRINTVISITOR_H__

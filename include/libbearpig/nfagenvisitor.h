@@ -6,6 +6,8 @@
 #include <libbearpig/basevisitor.h>
 #include <vector>
 
+namespace bp {
+
 class NfaGenVisitor : public BaseVisitor {
 private:
   NFA &nfa;
@@ -31,5 +33,7 @@ public:
   void invalid_range_error(RChar startchar, RChar stopchar);
   void confusing_range_warning(RChar start, RChar stop);
 };
+
+} // namespace bp
 
 #endif // NFAGENVISITOR_H_

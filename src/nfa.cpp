@@ -5,6 +5,8 @@
 #include <stack>
 #include <vector>
 
+namespace bp {
+
 void NFA::to_dot(std::filesystem::path dotfile) const {
 
   std::ofstream outstream{dotfile};
@@ -183,3 +185,4 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
   }
   return result;
 }
+} // namespace bp

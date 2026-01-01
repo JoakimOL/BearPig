@@ -4,6 +4,8 @@
 #include <string_view>
 #include <vector>
 
+namespace bp {
+
 class RegexScanner {
 public:
   RegexScanner(const std::string_view input);
@@ -15,5 +17,7 @@ private:
   const std::string_view input;
   int current_column;
 };
+
+} // namespace bp
 
 #endif // REGEXSCANNER_H_

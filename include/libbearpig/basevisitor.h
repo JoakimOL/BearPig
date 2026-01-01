@@ -3,6 +3,7 @@
 
 #include <libbearpig/regexast.h>
 
+namespace bp {
 class BaseVisitor {
 public:
   virtual void visit(AlternativeExp &) = 0;
@@ -16,5 +17,6 @@ public:
   virtual void visit(EscapeSeq &) = 0;
   virtual ~BaseVisitor() = default;
 };
+} // namespace bp
 
 #endif // BASEVISITOR_H__

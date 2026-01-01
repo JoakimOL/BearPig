@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+namespace bp {
+
 class BaseVisitor;
 class AlternativeExp;
 
@@ -142,5 +144,6 @@ struct AlternativeExp : public Visitable {
   void apply(BaseVisitor *v) override;
   std::vector<ConcatExp> alternatives{};
 };
+} // namespace bp
 
 #endif // REGEXAST_H__

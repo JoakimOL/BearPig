@@ -4,6 +4,8 @@
 #include <libbearpig/nfagenvisitor.h>
 #include <libbearpig/regexast.h>
 
+namespace bp {
+
 void NfaGenVisitor::print_diag_message(const std::string &msg, size_t start,
                                        size_t stop,
                                        spdlog::level::level_enum level) {
@@ -206,3 +208,4 @@ void NfaGenVisitor::visit(EscapeSeq &exp) {
   id = subexpstart;
   return;
 }
+} // namespace bp

@@ -4,6 +4,8 @@
 #include <array>
 #include <string>
 
+namespace bp {
+
 enum class RegexTokenType {
   // Braces
   PAREN_OPEN,
@@ -55,5 +57,7 @@ struct RegexToken {
 };
 
 const RegexToken &invalid_token();
+
+} // namespace bp
 
 #endif // REGEXTOKENS_H_

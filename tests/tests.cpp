@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <libbearpig/lib.h>
 
+using namespace bp;
+
 TEST(REGEXPARSER, basic_able_to_parse_characters) {
   RegexScanner rs{"a"};
 

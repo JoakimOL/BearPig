@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+namespace bp {
+
 class RegexParser {
 public:
   bool parse();
@@ -49,5 +51,6 @@ private:
   RegexToken current_token;
   bool invalid = false;
 };
+} // namespace bp
 
 #endif // REGEXPARSER_H_

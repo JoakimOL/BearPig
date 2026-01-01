@@ -2,6 +2,8 @@
 #include <libbearpig/printvisitor.h>
 #include <libbearpig/regexast.h>
 
+namespace bp {
+
 void PrintVisitor::visit(AlternativeExp &exp) {
 
   std::string indentation = fmt::format("{: >{}}", "", depth);
@@ -75,3 +77,4 @@ void PrintVisitor::visit(EscapeSeq &exp) {
                exp.character.data, depth);
   return;
 }
+} // namespace bp
