@@ -7,8 +7,9 @@ fetchcontent_declare(
 
 fetchcontent_makeavailable(googletest)
 
-# Tests need to be added as executables first
-add_executable(bearpigtests tests.cpp)
+add_executable(bearpigtests
+    parsertests.cpp
+)
 
 target_compile_features(bearpigtests PRIVATE cxx_std_20)
 
