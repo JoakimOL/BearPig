@@ -101,9 +101,12 @@ std::vector<RegexMatch> NFA::find_all_matches(std::string_view input) {
     for (; i < input.size() && !starts.contains(input[i]); i++)
       ;
     auto match = run_nfa(input.substr(i), false, i);
-    if (match.success)
+    if (match.success) {
       matches.emplace_back(match);
-    i++;
+      i += match.length;
+    } else {
+      i++;
+    }
   }
   return matches;
 }

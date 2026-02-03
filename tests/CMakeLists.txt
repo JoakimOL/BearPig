@@ -9,6 +9,7 @@ fetchcontent_makeavailable(googletest)
 
 add_executable(bearpigtests
     parsertests.cpp
+    e2etest.cpp
 )
 
 target_compile_features(bearpigtests PRIVATE cxx_std_20)
@@ -19,4 +20,3 @@ target_link_libraries(bearpigtests PRIVATE
 )
 
 add_test(NAME bearpigtests COMMAND bearpigtests) 
-
