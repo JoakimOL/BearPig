@@ -2,7 +2,6 @@
 #define NFAGENVISITOR_H_
 
 #include "libbearpig/nfa.h"
-#include "spdlog/common.h"
 #include <libbearpig/basevisitor.h>
 #include <vector>
 
@@ -28,8 +27,6 @@ public:
   void visit(AnyExp &) override;
   void visit(EscapeSeq &) override;
 
-  void print_diag_message(const std::string &msg, size_t start, size_t stop,
-                          spdlog::level::level_enum level = spdlog::level::err);
   void invalid_range_error(RChar startchar, RChar stopchar);
   void confusing_range_warning(RChar start, RChar stop);
 };

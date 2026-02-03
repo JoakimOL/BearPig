@@ -4,29 +4,31 @@
 #include <libbearpig/nfagenvisitor.h>
 #include <libbearpig/regexast.h>
 
-namespace bp {
-
-void NfaGenVisitor::print_diag_message(const std::string &msg, size_t start,
-                                       size_t stop,
-                                       spdlog::level::level_enum level) {
+namespace {
+void print_diag_message(const std::string &msg,
+                        std::vector<bp::RegexToken> tokenstream, size_t start,
+                        size_t stop, spdlog::level::level_enum level) {
   std::stringstream ss;
   // 31 = red for error, 33 = yellow for warning
   std::string color = level == spdlog::level::err ? "31" : "33";
   std::for_each(tokenstream.cbegin(), tokenstream.cend(),
-                [&ss](RegexToken t) { ss << t.data; });
+                [&ss](bp::RegexToken t) { ss << t.data; });
   spdlog::log(level, msg);
   spdlog::log(level, ss.str());
   std::string padding = fmt::format("{: >{}}", " ", start);
   std::string diag_line = fmt::format("{:^>{}}", "^", stop - start + 1);
   spdlog::log(level, "\033[{}m{}{}\033[0m", color, padding, diag_line);
 }
+} // namespace
+
+namespace bp {
 
 void NfaGenVisitor::invalid_range_error(RChar startchar, RChar stopchar) {
 
   print_diag_message(fmt::format("[{}-{}] is an invalid range",
                                  startchar.character.data,
                                  stopchar.character.data),
-                     startchar.character.column, stopchar.character.column);
+                     tokenstream, startchar.character.column, stopchar.character.column, spdlog::level::err);
   exit(1);
 }
 
@@ -37,7 +39,7 @@ void NfaGenVisitor::confusing_range_warning(RChar startchar, RChar stopchar) {
       fmt::format("[{}-{}] might not do what you expected. Consider not mixing "
                   "upper case and lower case symbols in the same range",
                   startchar.character.data, stopchar.character.data),
-      columnstart, columnstop, spdlog::level::warn);
+      tokenstream, columnstart, columnstop, spdlog::level::warn);
 }
 
 void NfaGenVisitor::visit(AlternativeExp &exp) {

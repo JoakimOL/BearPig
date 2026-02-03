@@ -1,7 +1,5 @@
 #ifndef NFA_H_
 #define NFA_H_
-#include "fmt/core.h"
-#include "fmt/ranges.h"
 #include <filesystem>
 #include <map>
 #include <set>
@@ -62,24 +60,6 @@ public:
 };
 
 } // namespace bp
-
-template <> struct fmt::formatter<bp::Transition> {
-  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-  template <typename FormatContext>
-  auto format(const bp::Transition &trans, FormatContext &ctx) const {
-    return fmt::format_to(ctx.out(), "(from {} to {} {})", trans.from, trans.to,
-                          trans.edge == 0 ? ""
-                                          : fmt::format("over {}", trans.edge));
-  }
-};
-
-template <> struct fmt::formatter<bp::State> {
-  constexpr auto parse(format_parse_context &ctx) { return ctx.end(); }
-  template <typename FormatContext>
-  auto format(const bp::State &state, FormatContext &ctx) const {
-    return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
-  }
-};
 
 
 #endif // NFA_H_
