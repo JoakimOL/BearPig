@@ -45,10 +45,8 @@ void NfaGenVisitor::confusing_range_warning(RChar startchar, RChar stopchar) {
 void NfaGenVisitor::visit(AlternativeExp &exp) {
 
   spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t start = nfa.add_state();
   size_t parent_id = id;
   size_t end = nfa.add_state();
-  nfa.add_transition_to_state(parent_id, start, 0);
   if (nfa.currentAccept.id == parent_id) {
     spdlog::debug("accepting state was: {}, current:{}", nfa.currentAccept.id,
                   end);
@@ -56,10 +54,9 @@ void NfaGenVisitor::visit(AlternativeExp &exp) {
     nfa.currentAccept = nfa.states.at(end);
     nfa.states.at(end).is_accept = true;
   }
-  id = start;
   for (size_t i = 0; i < exp.alternatives.size(); i++) {
     size_t new_state = nfa.add_state();
-    nfa.add_transition_to_state(start, new_state, 0);
+    nfa.add_transition_to_state(parent_id, new_state, 0);
     // nfa.add_transition_to_state(start, new_state, '1');
     id = new_state;
     exp.alternatives[i].apply(this);
@@ -73,11 +70,7 @@ void NfaGenVisitor::visit(AlternativeExp &exp) {
 void NfaGenVisitor::visit(ConcatExp &exp) {
   spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
 
-  size_t start = nfa.add_state();
-  size_t parent_id = id;
   // nfa.add_transition_to_state(parent_id, start, '2');
-  nfa.add_transition_to_state(parent_id, start, 0);
-  id = start;
   for (size_t i = 0; i < exp.exps.size(); i++) {
     exp.exps[i].apply(this);
   }

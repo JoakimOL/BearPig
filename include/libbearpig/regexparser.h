@@ -47,7 +47,7 @@ private:
   void print_error_message_and_exit(const std::string &, int loc);
   std::vector<RegexToken> tokenstream;
   std::unique_ptr<AlternativeExp> expression_top;
-  int current_token_idx;
+  int current_token_idx{0};
   RegexToken current_token;
   bool invalid = false;
 };

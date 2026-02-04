@@ -18,10 +18,6 @@ std::vector<RegexToken> RegexScanner::tokenize() {
   while (current_column < input.size()) {
     tokens.emplace_back(next());
   }
-  for (auto token : tokens) {
-    spdlog::debug("token: {} ({}) at {}", token.data,
-                  to_string(token.tokentype), token.column);
-  }
   return tokens;
 }
 
