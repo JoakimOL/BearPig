@@ -198,6 +198,10 @@ void NfaGenVisitor::visit(AnyExp &exp) {
   // not quite sure how to implement this yet
   // it seems dependant on how i implement the traversal and how i consume
   // characters
+  size_t subexpstart = nfa.add_state();
+  size_t parent_id = id;
+  nfa.add_transition_to_state(parent_id, subexpstart, 1);
+  id = subexpstart;
   return;
 }
 

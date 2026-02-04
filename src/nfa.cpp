@@ -3,11 +3,14 @@
 #include <fstream>
 #include <libbearpig/nfa.h>
 #include <stack>
+#include <utility>
 #include <vector>
 #include "fmt/core.h"
 #include "fmt/ranges.h"
 
 namespace bp {
+
+char ANY_CHAR{0x1};
 
 void NFA::to_dot(std::filesystem::path dotfile) const {
 
@@ -98,7 +101,9 @@ std::vector<RegexMatch> NFA::find_all_matches(std::string_view input) {
   std::vector<RegexMatch> matches{};
   size_t i = 0;
   while (i <= input.size()) {
-    for (; i < input.size() && !starts.contains(input[i]); i++)
+    for (; i < input.size() &&
+           !(starts.contains(input[i]) || starts.contains(ANY_CHAR));
+         i++)
       ;
     auto match = run_nfa(input.substr(i), false, i);
     if (match.success) {
@@ -116,7 +121,9 @@ RegexMatch NFA::find_first_match(std::string_view input) {
   RegexMatch match{.success = false};
   size_t i = 0;
   while (i <= input.size() && !match.success) {
-    for (; i < input.size() && !starts.contains(input[i]); i++)
+    for (; i < input.size() &&
+           !(starts.contains(input[i]) || starts.contains(ANY_CHAR));
+         i++)
       ;
     match = run_nfa(input.substr(i), false, i);
     i++;
@@ -131,16 +138,15 @@ RegexMatch NFA::exact_match(std::string_view input) {
 RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
   RegexMatch result{.success = false, .start = start_id};
   std::set<size_t> current_states{0};
+  std::set<size_t> next_states;
+  std::set<size_t> epsilon_states;
   current_states.merge(get_all_available_epsilon_transitions(0));
-  std::vector<Transition> available_transitions;
   size_t current_input{0};
-  char current_char = input[current_input];
-  bool should_greed{false};
+  bool should_greed{true};
 
   while (true) {
+    char current_char = input[current_input];
 
-    std::set<size_t> next_states;
-    std::set<size_t> epsilon_states;
     spdlog::debug("current_char: {}({})", current_char, (int)current_char);
     for (auto state : current_states) {
       spdlog::debug(
@@ -160,23 +166,28 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
     for (auto state : current_states) {
       auto current_state = states.at(state);
       spdlog::debug(
-          "iterating: looking for {}. found state {} with transitions:",
-          current_char, state);
+          "{}::iterating: looking for {}. found state {} with transitions:",
+          __func__, current_char, state);
       for (auto transition : current_state.transitions) {
         spdlog::debug("from: {} to: {} edge: {}", transition.second.from,
                       transition.second.to, transition.second.edge);
       }
-      if (current_input < input.size() &&
-          current_state.transitions.contains(current_char)) {
+      if (current_input >= input.size()) {
+        continue;
+      } else if (current_state.transitions.contains(current_char)) {
         spdlog::debug("state {} has a transition matching the character {}!",
                       state, current_char);
         next_states.insert(
             current_state.transitions.find(current_char)->second.to);
-        should_greed = true;
+      } else if (current_state.transitions.contains(ANY_CHAR)) {
+        spdlog::debug("state {} has a transition matching any character!",
+                      state);
+        next_states.insert(current_state.transitions.find(ANY_CHAR)->second.to);
       }
+      should_greed = true;
     }
     for (auto state : next_states) {
-      epsilon_states.merge(get_all_available_epsilon_transitions(state));
+      epsilon_states = get_all_available_epsilon_transitions(state);
     }
     next_states.merge(epsilon_states);
     current_input++;
@@ -184,12 +195,13 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
     if (next_states.size() == 0) {
       return result;
     }
-    current_states = next_states;
+    std::swap(current_states, next_states);
+    epsilon_states.clear();
     next_states.clear();
-    current_char = input[current_input];
   }
   return result;
 }
+
 } // namespace bp
 
 template <> struct fmt::formatter<bp::Transition> {
