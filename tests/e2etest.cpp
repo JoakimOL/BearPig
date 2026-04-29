@@ -59,3 +59,84 @@ TEST(E2E, That_example_that_broke_find_all_matches) {
     EXPECT_EQ(match.length, 1);
   }
 }
+
+TEST(E2E, Basic_any_char_test){
+  const std::string input{"abcdefg"};
+  NFA nfa;
+  setup(".+", nfa);
+  {
+    auto match = nfa.exact_match(input);
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "abcdefg");
+    EXPECT_EQ(match.length, 7);
+  }
+  {
+    auto match = nfa.find_first_match(input);
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "abcdefg");
+    EXPECT_EQ(match.length, 7);
+  }
+  {
+    auto matches = nfa.find_all_matches(input);
+    EXPECT_EQ(matches.size(), 1);
+    auto match = matches.front();
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "abcdefg");
+    EXPECT_EQ(match.length, 7);
+  }
+}
+
+TEST(E2E, Subsequent_any_char_test){
+  const std::string input{"xaax"};
+  NFA nfa;
+  setup("(a?)(ab)?", nfa);
+  {
+    auto match = nfa.exact_match(input);
+    EXPECT_FALSE(match.success);
+    EXPECT_EQ(match.match, "");
+    EXPECT_EQ(match.length, 0);
+  }
+  {
+    auto match = nfa.find_first_match(input);
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "a");
+    EXPECT_EQ(match.length, 1);
+  }
+  {
+    auto matches = nfa.find_all_matches(input);
+    EXPECT_EQ(matches.size(), 3);
+    auto match = matches.front();
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "a");
+    EXPECT_EQ(match.start, 1);
+    EXPECT_EQ(match.length, 1);
+  }
+}
+
+TEST(E2E, This_thing_i_found_online){
+  const std::string input{"xaax"};
+  NFA nfa;
+  setup("(a?)(ab)?", nfa);
+  {
+    auto match = nfa.exact_match(input);
+    EXPECT_FALSE(match.success);
+    EXPECT_EQ(match.match, "");
+    EXPECT_EQ(match.length, 0);
+  }
+  {
+    auto match = nfa.find_first_match(input);
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "a");
+    EXPECT_EQ(match.length, 1);
+  }
+  {
+    auto matches = nfa.find_all_matches(input);
+    EXPECT_EQ(matches.size(), 3);
+    auto match = matches.front();
+    EXPECT_TRUE(match.success);
+    EXPECT_EQ(match.match, "a");
+    EXPECT_EQ(match.start, 1);
+    EXPECT_EQ(match.length, 1);
+  }
+}
+
