@@ -187,7 +187,7 @@ RegexMatch NFA::run_nfa(std::string_view input, bool exact, size_t start_id) {
       should_greed = true;
     }
     for (auto state : next_states) {
-      epsilon_states = get_all_available_epsilon_transitions(state);
+      epsilon_states.merge(get_all_available_epsilon_transitions(state));
     }
     next_states.merge(epsilon_states);
     current_input++;
@@ -221,4 +221,3 @@ template <> struct fmt::formatter<bp::State> {
     return fmt::format_to(ctx.out(), "{}:{}", state.id, state.transitions);
   }
 };
-
