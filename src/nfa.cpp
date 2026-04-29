@@ -108,7 +108,7 @@ std::vector<RegexMatch> NFA::find_all_matches(std::string_view input) {
     auto match = run_nfa(input.substr(i), false, i);
     if (match.success) {
       matches.emplace_back(match);
-      i += match.length;
+      i += std::max(match.length, 1UL);
     } else {
       i++;
     }
