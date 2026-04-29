@@ -1,24 +1,20 @@
 #ifndef PRINTVISITOR_H__
 #define PRINTVISITOR_H__
 
-#include <libbearpig/basevisitor.h>
+#include "libbearpig/regexast.h"
 
 namespace bp {
 
-class PrintVisitor : public BaseVisitor {
-private:
+struct PrintVisitor {
   int depth{0};
-
-public:
-  void visit(AlternativeExp &) override;
-  void visit(ConcatExp &) override;
-  void visit(QuantifiedExp &) override;
-  void visit(GroupExp &) override;
-  void visit(SetExp &) override;
-  void visit(SetItem &) override;
-  void visit(RChar &) override;
-  void visit(AnyExp &) override;
-  void visit(EscapeSeq &) override;
+  void operator()(this PrintVisitor &self, AlternativeExp &exp);
+  void operator()(this PrintVisitor &self, ConcatExp &exp);
+  void operator()(this PrintVisitor &self, QuantifiedExp &exp);
+  void operator()(this PrintVisitor &self, GroupExp &exp);
+  void operator()(this PrintVisitor &self, SetExp &exp);
+  void operator()(this PrintVisitor &self, SetItem &exp);
+  void operator()(this PrintVisitor &self, RChar &exp);
+  void operator()(this PrintVisitor &self, AnyExp &exp);
 };
 
 } // namespace bp

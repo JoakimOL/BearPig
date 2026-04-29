@@ -4,7 +4,6 @@ set(HEADER_LIST
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexparser.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/regexast.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/nfa.h"
-  "${bearpig_SOURCE_DIR}/include/libbearpig/basevisitor.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/printvisitor.h"
   "${bearpig_SOURCE_DIR}/include/libbearpig/nfagenvisitor.h"
 )
@@ -28,5 +27,5 @@ target_link_libraries(libbearpig PRIVATE
   argparse
 )
 
-# All users of this library will need at least C++20
-target_compile_features(libbearpig PUBLIC cxx_std_20)
+# All users of this library will need at least C++23
+target_compile_features(libbearpig PUBLIC cxx_std_23)

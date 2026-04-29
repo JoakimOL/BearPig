@@ -164,25 +164,25 @@ QuantifiedExp RegexParser::parse_quantified_exp() {
   return quantified_exp;
 }
 
-std::unique_ptr<ElementaryExp> RegexParser::parse_elementary_exp() {
+ElementaryExp RegexParser::parse_elementary_exp() {
   spdlog::debug("{}::current_token: {} ({}) at {}", __func__,
                 current_token.data, to_string(current_token.tokentype),
                 current_token.column);
   switch (current_token.tokentype) {
   case (RegexTokenType::PAREN_OPEN): {
-    return std::make_unique<GroupExp>(parse_group());
+    return parse_group();
   }
   case (RegexTokenType::ANY): {
-    return std::make_unique<AnyExp>(parse_any());
+    return parse_any();
   }
   case (RegexTokenType::SQUARE_OPEN): {
-    return std::make_unique<SetExp>(parse_set());
+    return parse_set();
   }
   case (RegexTokenType::CHARACTER): {
-    return std::make_unique<RChar>(parse_character());
+    return parse_character();
   }
   case (RegexTokenType::ESCAPE): {
-    return std::make_unique<EscapeSeq>(parse_escape_seq());
+    return parse_escape_seq();
   }
   default:
     unexpected_token_error(__func__, RegexTokenType::PAREN_OPEN,
@@ -205,12 +205,13 @@ RChar RegexParser::parse_character(bool single) {
   return character;
 }
 
-EscapeSeq RegexParser::parse_escape_seq() {
+RChar RegexParser::parse_escape_seq() {
   spdlog::debug("{}::current {} next: {}", __func__,
                 to_string(current_token.tokentype),
                 to_string(tokenstream.at(current_token_idx + 1).tokentype));
-  EscapeSeq esc;
+  RChar esc;
   esc.idx = current_token_idx;
+  esc.is_escape = true;
   consume_wf(RegexTokenType::ESCAPE);
   auto escaped_token = current_token;
   esc.character = escaped_token;

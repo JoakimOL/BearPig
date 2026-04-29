@@ -27,14 +27,14 @@ private:
   ConcatExp parse_concatenation_exp();
   QuantifiedExp parse_quantified_exp();
   AlternativeExp parse_alternative();
-  std::unique_ptr<ElementaryExp> parse_elementary_exp();
+  ElementaryExp parse_elementary_exp();
   AnyExp parse_any();
   GroupExp parse_group();
   SetExp parse_set();
   std::vector<SetItem> parse_set_items();
   SetItem parse_set_item();
   RChar parse_character(bool single = false);
-  EscapeSeq parse_escape_seq();
+  RChar parse_escape_seq();
 
   void end_of_input_error();
   template <typename... Rs>

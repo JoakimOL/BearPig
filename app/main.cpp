@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     bp::AlternativeExp *top = regex_parser.get_top_of_expression();
     if (program.is_used("-v")) {
       bp::PrintVisitor p{};
-      top->apply(&p);
+      p(*top);
     }
   } else {
     spdlog::warn("unsuccessful parse");
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
   bp::NFA nfa;
   bp::NfaGenVisitor nfagen{nfa, tokens};
   bp::AlternativeExp *top = regex_parser.get_top_of_expression();
-  top->apply(&nfagen);
+  nfagen(*top);
   nfa.to_dot();
 
   auto exact_match = nfa.exact_match(input);

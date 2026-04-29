@@ -3,72 +3,61 @@
 
 #include <libbearpig/regextokens.h>
 #include <memory>
+#include <variant>
 #include <vector>
 
 namespace bp {
 
-class BaseVisitor;
-class AlternativeExp;
-
-class Visitable {
-public:
-  virtual void apply(BaseVisitor *v) = 0;
-  virtual ~Visitable() = default;
-};
+struct AlternativeExp;
+struct SetExp;
+struct GroupExp;
+struct AnyExp;
+struct RChar;
 
 // ElementaryExps arent a thing, they just form a natural group of other
 // expressions
-struct ElementaryExp : public Visitable {};
+using ElementaryExp = std::variant<SetExp, GroupExp, AnyExp, RChar>;
 
-struct AnyExp : public ElementaryExp {
+struct AnyExp {
   ~AnyExp() = default;
-  void apply(BaseVisitor *v) override;
 };
 
-struct RChar : public ElementaryExp {
+struct RChar {
   ~RChar() = default;
-  void apply(BaseVisitor *v) override;
   int idx;
   RegexToken character;
+  bool is_escape{false};
   std::string to_string() { return std::string{character.data}; }
 };
 
-struct EscapeSeq : public RChar {
-  ~EscapeSeq() = default;
-  void apply(BaseVisitor *v) override;
-};
-
-struct SetItem : public Visitable {
+struct SetItem {
   ~SetItem() = default;
-  void apply(BaseVisitor *v) override;
   bool range{false};
   RChar start;
   RChar stop;
 };
 
-struct SetExp : public ElementaryExp {
+struct SetExp {
   ~SetExp() = default;
-  void apply(BaseVisitor *v) override;
   bool negative = false;
   std::vector<SetItem> items;
 };
 
-struct GroupExp : public ElementaryExp {
-  explicit GroupExp() = default;
-  ~GroupExp() = default;
+struct GroupExp {
   explicit GroupExp(const GroupExp &other) = delete;
-  GroupExp(GroupExp &&other) : subExp(std::move(other.subExp)) {}
+  explicit GroupExp();
+  ~GroupExp();
+  GroupExp(GroupExp &&other);
 
   GroupExp &operator=(const GroupExp &other) = delete;
   GroupExp &operator=(GroupExp &&other) {
     subExp.swap(other.subExp);
     return *this;
   }
-  void apply(BaseVisitor *v) override;
   std::unique_ptr<AlternativeExp> subExp{};
 };
 
-struct QuantifiedExp : public Visitable {
+struct QuantifiedExp {
   QuantifiedExp(QuantifiedExp &&other)
       : exp(std::move(other.exp)), quantifier(other.quantifier) {}
   explicit QuantifiedExp(const QuantifiedExp &other) = delete;
@@ -79,7 +68,6 @@ struct QuantifiedExp : public Visitable {
     return *this;
   }
   ~QuantifiedExp() = default;
-  void apply(BaseVisitor *v) override;
 
   enum class Quantifier {
     NONE,
@@ -107,10 +95,10 @@ struct QuantifiedExp : public Visitable {
   }
 
   Quantifier quantifier = Quantifier::NONE;
-  std::unique_ptr<ElementaryExp> exp;
+  ElementaryExp exp;
 };
 
-struct ConcatExp : public Visitable {
+struct ConcatExp {
   ConcatExp(ConcatExp &&other) : exps(std::move(other.exps)) {}
   explicit ConcatExp(const ConcatExp &other) = delete;
   explicit ConcatExp() = default;
@@ -120,7 +108,6 @@ struct ConcatExp : public Visitable {
     return *this;
   }
   ~ConcatExp() = default;
-  void apply(BaseVisitor *v) override;
   std::vector<QuantifiedExp> exps;
 
   void merge(ConcatExp &other) {
@@ -130,7 +117,7 @@ struct ConcatExp : public Visitable {
   }
 };
 
-struct AlternativeExp : public Visitable {
+struct AlternativeExp {
   AlternativeExp(AlternativeExp &&other)
       : alternatives(std::move(other.alternatives)) {}
   explicit AlternativeExp(const AlternativeExp &other) = delete;
@@ -141,7 +128,6 @@ struct AlternativeExp : public Visitable {
     return *this;
   }
   ~AlternativeExp() = default;
-  void apply(BaseVisitor *v) override;
   std::vector<ConcatExp> alternatives{};
 };
 } // namespace bp

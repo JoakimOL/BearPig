@@ -20,7 +20,7 @@ void setup(std::string_view regex, NFA &nfa) {
   EXPECT_NE(top, nullptr);
 
   NfaGenVisitor nfa_generator{nfa, tokens};
-  top->apply(&nfa_generator);
+  nfa_generator(*top);
 }
 
 TEST(E2E, Basic_E2E_test) {

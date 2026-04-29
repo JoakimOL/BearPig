@@ -42,169 +42,162 @@ void NfaGenVisitor::confusing_range_warning(RChar startchar, RChar stopchar) {
       tokenstream, columnstart, columnstop, spdlog::level::warn);
 }
 
-void NfaGenVisitor::visit(AlternativeExp &exp) {
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, AlternativeExp &exp) {
 
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t parent_id = id;
-  size_t end = nfa.add_state();
-  if (nfa.currentAccept.id == parent_id) {
-    spdlog::debug("accepting state was: {}, current:{}", nfa.currentAccept.id,
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
+  size_t parent_id = self.id;
+  size_t end = self.nfa.add_state();
+  if (self.nfa.currentAccept.id == parent_id) {
+    spdlog::debug("accepting state was: {}, current:{}", self.nfa.currentAccept.id,
                   end);
-    nfa.currentAccept.is_accept = false;
-    nfa.currentAccept = nfa.states.at(end);
-    nfa.states.at(end).is_accept = true;
+    self.nfa.currentAccept.is_accept = false;
+    self.nfa.currentAccept = self.nfa.states.at(end);
+    self.nfa.states.at(end).is_accept = true;
   }
   for (size_t i = 0; i < exp.alternatives.size(); i++) {
-    size_t new_state = nfa.add_state();
-    nfa.add_transition_to_state(parent_id, new_state, 0);
-    // nfa.add_transition_to_state(start, new_state, '1');
-    id = new_state;
-    exp.alternatives[i].apply(this);
-    nfa.add_transition_to_state(id, end, 0);
-    // nfa.add_transition_to_state(id, end, 'e');
+    size_t new_state = self.nfa.add_state();
+    self.nfa.add_transition_to_state(parent_id, new_state, 0);
+    self.id = new_state;
+    self(exp.alternatives[i]);
+    self.nfa.add_transition_to_state(self.id, end, 0);
   }
-  id = end;
+  self.id = end;
   return;
 }
 
-void NfaGenVisitor::visit(ConcatExp &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, ConcatExp &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
 
   // nfa.add_transition_to_state(parent_id, start, '2');
   for (size_t i = 0; i < exp.exps.size(); i++) {
-    exp.exps[i].apply(this);
+    self(exp.exps[i]);
   }
   return;
 }
 
-void NfaGenVisitor::visit(QuantifiedExp &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t start = id;
-  size_t end = nfa.add_state();
+void NfaGenVisitor::operator()(this NfaGenVisitor &self, QuantifiedExp &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
+  size_t start = self.id;
+  size_t end = self.nfa.add_state();
 
   switch (exp.quantifier) {
   case QuantifiedExp::Quantifier::NONE: {
-    exp.exp->apply(this);
-    nfa.add_transition_to_state(id, end, 0);
+    std::visit(self, exp.exp);
+    // exp.exp->apply(this);
+    self.nfa.add_transition_to_state(self.id, end, 0);
     break;
   };
   case QuantifiedExp::Quantifier::STAR: {
-    exp.exp->apply(this);
-    nfa.add_transition_to_state(id, start, 0);
-    nfa.add_transition_to_state(start, end, 0);
-    nfa.add_transition_to_state(id, end, 0);
+    std::visit(self, exp.exp);
+    self.nfa.add_transition_to_state(self.id, start, 0);
+    self.nfa.add_transition_to_state(start, end, 0);
+    self.nfa.add_transition_to_state(self.id, end, 0);
     break;
   }
   case QuantifiedExp::Quantifier::PLUS: {
-    exp.exp->apply(this);
-    nfa.add_transition_to_state(id, start, 0);
-    nfa.add_transition_to_state(id, end, 0);
+    std::visit(self, exp.exp);
+    self.nfa.add_transition_to_state(self.id, start, 0);
+    self.nfa.add_transition_to_state(self.id, end, 0);
     break;
   };
   case QuantifiedExp::Quantifier::OPTIONAL: {
-    exp.exp->apply(this);
-    nfa.add_transition_to_state(id, end, 0);
-    nfa.add_transition_to_state(start, end, 0);
+    std::visit(self, exp.exp);
+    self.nfa.add_transition_to_state(self.id, end, 0);
+    self.nfa.add_transition_to_state(start, end, 0);
     break;
   }
   }
-  id = end;
+  self.id = end;
 
   return;
 }
 
-void NfaGenVisitor::visit(GroupExp &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, GroupExp &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
   // size_t subexpstart = nfa.add_state();
-  exp.subExp->apply(this);
+  // exp.subExp->apply(this);
+  self(*exp.subExp);
   return;
 }
 
-void NfaGenVisitor::visit(SetExp &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t start = nfa.add_state();
-  nfa.add_transition_to_state(id, start, 0);
-  size_t end = nfa.add_state();
-  id = start;
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, SetExp &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
+  size_t start = self.nfa.add_state();
+  self.nfa.add_transition_to_state(self.id, start, 0);
+  size_t end = self.nfa.add_state();
+  self.id = start;
   for (auto item : exp.items) {
-    size_t new_state = nfa.add_state();
-    nfa.add_transition_to_state(start, new_state, 0);
-    id = new_state;
-    item.apply(this);
-    nfa.add_transition_to_state(id, end, 0);
+    size_t new_state = self.nfa.add_state();
+    self.nfa.add_transition_to_state(start, new_state, 0);
+    self.id = new_state;
+    // item.apply(this);
+    self(item);
+    self.nfa.add_transition_to_state(self.id, end, 0);
   }
-  id = end;
+  self.id = end;
 
   return;
 }
 
-void NfaGenVisitor::visit(SetItem &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t subexpstart = nfa.add_state();
-  size_t end = nfa.add_state();
-  size_t parent_id = id;
-  id = subexpstart;
-  nfa.add_transition_to_state(parent_id, subexpstart, 0);
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, SetItem &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
+  size_t subexpstart = self.nfa.add_state();
+  size_t end = self.nfa.add_state();
+  size_t parent_id = self.id;
+  self.id = subexpstart;
+  self.nfa.add_transition_to_state(parent_id, subexpstart, 0);
   if (exp.range) {
     char startchar = exp.start.character.data;
     char stopchar = exp.stop.character.data;
     if (startchar > stopchar) {
-      invalid_range_error(exp.start, exp.stop);
+      self.invalid_range_error(exp.start, exp.stop);
     } else if (stopchar >= 91 && startchar <= 96) {
-      confusing_range_warning(exp.start, exp.stop);
+      self.confusing_range_warning(exp.start, exp.stop);
     }
     char diff = stopchar - startchar;
     for (char i = 0; i <= diff; i++) {
-      size_t new_state = nfa.add_state();
-      nfa.add_transition_to_state(subexpstart, new_state, 0);
-      // nfa.add_transition_to_state(subexpstart, new_state, '1');
-      id = new_state;
+      size_t new_state = self.nfa.add_state();
+      self.nfa.add_transition_to_state(subexpstart, new_state, 0);
+      // self.nfa.add_transition_to_state(subexpstart, new_state, '1');
+      self.id = new_state;
       RChar synth;
       synth.character = RegexToken{RegexTokenType::CHARACTER, exp.start.idx,
                                    static_cast<char>(startchar + i)};
       synth.idx = exp.start.idx;
-      synth.apply(this);
-      // nfa.add_transition_to_state(id, end, 'e');
-      nfa.add_transition_to_state(id, end, 0);
+      self(synth);
+      // synth.apply(this);
+      // self.nfa.add_transition_to_state(id, end, 'e');
+      self.nfa.add_transition_to_state(self.id, end, 0);
     }
   } else {
-    exp.start.apply(this);
-    // nfa.add_transition_to_state(id, end, 'e');
-    nfa.add_transition_to_state(id, end, 0);
+    self(exp.start);
+    // exp.start.apply(this);
+    // self.nfa.add_transition_to_state(id, end, 'e');
+    self.nfa.add_transition_to_state(self.id, end, 0);
   }
-  id = end;
+  self.id = end;
   return;
 }
 
-void NfaGenVisitor::visit(RChar &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t subexpstart = nfa.add_state();
-  size_t parent_id = id;
-  nfa.add_transition_to_state(parent_id, subexpstart, exp.character.data);
-  last_char = exp.character.data;
-  id = subexpstart;
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, RChar &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
+  size_t subexpstart = self.nfa.add_state();
+  size_t parent_id = self.id;
+  self.nfa.add_transition_to_state(parent_id, subexpstart, exp.character.data);
+  self.last_char = exp.character.data;
+  self.id = subexpstart;
   return;
 }
 
-void NfaGenVisitor::visit(AnyExp &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
+void NfaGenVisitor::operator()(this NfaGenVisitor& self, AnyExp &exp) {
+  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, self.id);
   // not quite sure how to implement this yet
   // it seems dependant on how i implement the traversal and how i consume
   // characters
-  size_t subexpstart = nfa.add_state();
-  size_t parent_id = id;
-  nfa.add_transition_to_state(parent_id, subexpstart, 1);
-  id = subexpstart;
-  return;
-}
-
-void NfaGenVisitor::visit(EscapeSeq &exp) {
-  spdlog::debug("{}! parent: {}", __PRETTY_FUNCTION__, id);
-  size_t subexpstart = nfa.add_state();
-  size_t parent_id = id;
-  nfa.add_transition_to_state(parent_id, subexpstart, exp.character.data);
-  last_char = exp.character.data;
-  id = subexpstart;
+  size_t subexpstart = self.nfa.add_state();
+  size_t parent_id = self.id;
+  self.nfa.add_transition_to_state(parent_id, subexpstart, 1);
+  self.id = subexpstart;
   return;
 }
 } // namespace bp
