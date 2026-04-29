@@ -85,6 +85,7 @@ void RegexParser::consume(std::string_view func, RegexTokenType expected) {
 #define consume_wf(expected) (consume((__func__), (expected)))
 
 bool RegexParser::parse() {
+  currentParseCtx = ParseContext();
   spdlog::debug("{}::current_token: {} idx: {}", __func__,
                 to_string(current_token.tokentype), current_token_idx);
   return parse_top_level();

@@ -8,6 +8,28 @@
 
 namespace bp {
 
+struct ParseContext {
+  enum class ErrorType {
+    NOERROR,
+  };
+  std::string parse_error_to_string(ErrorType err) {
+    switch (err) {
+    case ErrorType::NOERROR:
+      return "No Error";
+    default:
+      return "what the hell";
+    }
+  };
+  bool done{false};
+  ErrorType error{ErrorType::NOERROR};
+  size_t inputIndex{0};
+  void reset() {
+    done = false;
+    error = ErrorType::NOERROR;
+    inputIndex = 0;
+  }
+};
+
 class RegexParser {
 public:
   bool parse();
@@ -45,6 +67,8 @@ private:
   void consume(RegexTokenType expected);
   void consume(std::string_view func, RegexTokenType expected);
   void print_error_message_and_exit(const std::string &, int loc);
+
+  ParseContext currentParseCtx;
   std::vector<RegexToken> tokenstream;
   std::unique_ptr<AlternativeExp> expression_top;
   int current_token_idx{0};
