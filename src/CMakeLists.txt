@@ -20,6 +20,8 @@ add_library(libbearpig
    ${HEADER_LIST}
  )
 
+# target_include_directories(libbearpig PUBLIC ../api)
+# target_include_directories(libbearpig PRIVATE ../include)
 target_include_directories(libbearpig PUBLIC ../include)
 
 target_link_libraries(libbearpig PRIVATE
