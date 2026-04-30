@@ -35,7 +35,8 @@ TEST(E2E, Basic_E2E_test) {
 }
 
 TEST(E2E, That_example_that_broke_find_all_matches) {
-  const std::string input{"aaaaaabcbcbabcbcbacbCBACBCBacbcbacb09090abCBab09cb0a)0"};
+  const std::string input{
+      "aaaaaabcbcbabcbcbacbCBACBCBacbcbacb09090abCBab09cb0a)0"};
   NFA nfa;
   setup("([a-zA-Z]+|[0-9][0-9]?)+", nfa);
 
@@ -49,7 +50,8 @@ TEST(E2E, That_example_that_broke_find_all_matches) {
   {
     match = matches[0];
     EXPECT_TRUE(match.success);
-    EXPECT_EQ(match.match, "aaaaaabcbcbabcbcbacbCBACBCBacbcbacb09090abCBab09cb0a");
+    EXPECT_EQ(match.match,
+              "aaaaaabcbcbabcbcbacbCBACBCBacbcbacb09090abCBab09cb0a");
     EXPECT_EQ(match.length, 52);
   }
   {
@@ -60,7 +62,7 @@ TEST(E2E, That_example_that_broke_find_all_matches) {
   }
 }
 
-TEST(E2E, Basic_any_char_test){
+TEST(E2E, Basic_any_char_test) {
   const std::string input{"abcdefg"};
   NFA nfa;
   setup(".+", nfa);
@@ -86,7 +88,7 @@ TEST(E2E, Basic_any_char_test){
   }
 }
 
-TEST(E2E, Subsequent_any_char_test){
+TEST(E2E, Subsequent_any_char_test) {
   const std::string input{"xaax"};
   NFA nfa;
   setup("(a?)(ab)?", nfa);
@@ -113,7 +115,7 @@ TEST(E2E, Subsequent_any_char_test){
   }
 }
 
-TEST(E2E, This_thing_i_found_online){
+TEST(E2E, This_thing_i_found_online) {
   const std::string input{"xaax"};
   NFA nfa;
   setup("(a?)(ab)?", nfa);
@@ -139,4 +141,3 @@ TEST(E2E, This_thing_i_found_online){
     EXPECT_EQ(match.length, 1);
   }
 }
-

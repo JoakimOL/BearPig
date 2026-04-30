@@ -27,7 +27,6 @@ TEST(REGEXPARSER, basic_able_to_parse_characters) {
 
   EXPECT_EQ(quantified_exp.quantifier, QuantifiedExp::Quantifier::NONE);
 
-  // auto rchar = ((RChar *)quantified_exp.exp.get());
   auto rchar = std::get<RChar>(quantified_exp.exp);
   EXPECT_EQ(rchar.character.data, 'a');
   EXPECT_EQ(rchar.character.column, 0);

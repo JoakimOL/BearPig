@@ -1,3 +1,5 @@
+#include "fmt/core.h"
+#include "fmt/ranges.h"
 #include "spdlog/spdlog.h"
 #include <fmt/format.h>
 #include <fstream>
@@ -5,8 +7,6 @@
 #include <stack>
 #include <utility>
 #include <vector>
-#include "fmt/core.h"
-#include "fmt/ranges.h"
 
 namespace bp {
 

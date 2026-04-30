@@ -84,8 +84,9 @@ int main(int argc, char **argv) {
   spdlog::info("trying to find all matches.");
   auto matches = nfa.find_all_matches(input);
   spdlog::info("found {} matches", matches.size());
-  for(auto match : matches){
-    spdlog::info("{} from {} with length {}", match.match, match.start, match.length);
+  for (auto match : matches) {
+    spdlog::info("{} from {} with length {}", match.match, match.start,
+                 match.length);
   }
 
   return 0;
