@@ -1,6 +1,7 @@
 #include "spdlog/spdlog.h"
 #include <libbearpig/printvisitor.h>
 #include <libbearpig/regexast.h>
+#include <algorithm>
 
 namespace bp {
 
@@ -10,7 +11,7 @@ void PrintVisitor::operator()(this PrintVisitor &self, AlternativeExp &exp) {
   spdlog::info("{}{}:num_alternatives: {} (depth: {})", indentation,
                "AlternativeExp", exp.alternatives.size(), self.depth);
   self.depth++;
-  for_each(exp.alternatives.begin(), exp.alternatives.end(),
+  std::for_each(exp.alternatives.begin(), exp.alternatives.end(),
            [&self](ConcatExp &c) { self(c); });
   self.depth--;
   return;
@@ -20,7 +21,7 @@ void PrintVisitor::operator()(this PrintVisitor &self, ConcatExp &exp) {
   spdlog::info("{}{}:num concatenations: {} (depth: {})", indentation,
                "ConcatExp", exp.exps.size(), self.depth);
   self.depth++;
-  for_each(exp.exps.begin(), exp.exps.end(),
+  std::for_each(exp.exps.begin(), exp.exps.end(),
            [&self](QuantifiedExp &quantexp) { self(quantexp); });
   self.depth--;
   return;
@@ -48,7 +49,7 @@ void PrintVisitor::operator()(this PrintVisitor &self, SetExp &exp) {
   spdlog::info("{} {} {} (depth: {})", indentation, "SetExp",
                exp.negative ? "(Negative)" : "", self.depth);
   self.depth++;
-  for_each(exp.items.begin(), exp.items.end(),
+  std::for_each(exp.items.begin(), exp.items.end(),
            [&self](auto &item) { self(item); });
   self.depth--;
   return;

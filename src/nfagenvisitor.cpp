@@ -3,6 +3,7 @@
 #include <libbearpig/nfa.h>
 #include <libbearpig/nfagenvisitor.h>
 #include <libbearpig/regexast.h>
+#include <algorithm>
 
 namespace {
 void print_diag_message(const std::string &msg,
